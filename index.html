@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AOTAP</title>
+
+<!-- Tipografías: Inter (UI), EB Garamond (héroe fino), Cinzel (header elegante) -->
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+
+
+<style>
+  :root{
+    --brand-bg:#000; --brand-text:#fff;
+    --body-bg:#fff;  --body-text:#111; --muted:#555;
+    --accent:#000;
+    --gold:#d4af37;
+    --card-border:#e7e7e7; --shadow-sm:0 4px 14px rgba(0,0,0,.08);
+    --shadow-md:0 18px 44px rgba(0,0,0,.16);
+
+    /* Imagen del héroe: cámbiala en data-bg del #hero */
+    --hero-photo:url('https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=2000&auto=format&fit=crop');
+
+    /* Brillo de Categorización (RGB) */
+    --cat-glow-rgb: 59,130,246; /* azul #3b82f6 */
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+    color:var(--body-text);
+    background:var(--body-bg);
+    line-height:1.6;
+  }
+  img{max-width:100%;display:block}
+  .container{max-width:1110px;margin:0 auto;padding:0 16px}
+
+  /* ===== Header elegante ===== */
+  header{
+    position:sticky; top:0; z-index:1000;
+    background:var(--brand-bg); color:var(--brand-text);
+    box-shadow:0 1px 10px rgba(0,0,0,.15);
+  }
+  header::after{
+    content:""; display:block; height:2px;
+    background:linear-gradient(90deg, transparent, rgba(212,175,55,.6), transparent);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+  .brand{display:flex;gap:10px;align-items:center;text-decoration:none;color:#fff;position:relative}
+  .brand img{width:36px;height:36px;object-fit:contain}
+  .brand .title{
+    font-family:"Cinzel",serif; font-weight:700; letter-spacing:.6px;
+    position:relative; padding-bottom:2px;
+  }
+  .brand .title::after{
+    content:""; position:absolute; left:0; right:0; bottom:-4px; height:2px;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform:scaleX(.65); transform-origin:center; transition:transform .25s ease;
+    border-radius:999px;
+  }
+  .brand:hover .title::after{ transform:scaleX(1); }
+  .menu{display:flex;gap:16px;list-style:none;margin:0;padding:0}
+  .menu a{
+    color:#fff;text-decoration:none;padding:10px 12px;border-radius:10px;font-weight:600;position:relative;
+  }
+  .menu a::after{
+    content:""; position:absolute; left:12px; right:12px; bottom:6px; height:2px;
+    background:linear-gradient(90deg,transparent,#fff,transparent);
+    transform:scaleX(0); transform-origin:center; transition:transform .2s ease;
+    border-radius:999px;
+  }
+  .menu a:hover::after{ transform:scaleX(1); }
+  .burger{display:none;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.25);padding:8px 10px;border-radius:8px}
+  @media (max-width:768px){
+    .burger{display:block}
+    .menu{
+      display:none;position:absolute;left:0;right:0;top:66px;background:#000;
+      border-top:1px solid rgba(255,255,255,.12);padding:12px 16px;flex-direction:column;gap:10px
+    }
+    .menu.show{display:flex}
+  }
+
+  /* ===== Vistas ===== */
+  .view{display:none}
+  .view.active{display:block}
+
+  /* ===== HERO (tarjeta blanca abajo) ===== */
+  .hero-wrap{
+    position:below; min-height:105vh;
+    display:flex; align-items:flex-end; justify-content:center;
+    overflow:hidden; isolation:isolate;
+  }
+  .hero-bg{
+    position:absolute; inset:0;
+    background:#000 center/cover no-repeat; background-image:var(--hero-photo);
+    transform:scale(1.02);
+  }
+  .hero-bg::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.06) 0%,rgba(0,0,0,.18) 40%,rgba(0,0,0,.46) 100%);
+  }
+  .hero-card{
+    position:relative; z-index:2;
+    width:min(700px,86vw); background:#fff;
+    border:1px solid rgba(0,0,0,.06); border-radius:10px;
+    box-shadow:0 28px 64px rgba(0,0,0,.18);
+    padding:10px 10px 40px;           /* más aire interno */
+    text-align:center;
+    margin-bottom:1.4vh;               /* un poco más abajo */
+    animation:fadeUp .9s ease both;
+  }
+  .kicker{
+    font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    color:#1a1a1a;font-size:14px;margin-bottom:20px
+  }
+  /* —— Héroe con EB Garamond, fino —— */
+  .hero-title{
+    margin:0 0 7px; line-height:1.06;
+    font-family:"EB Garamond",;
+    font-weight:800;
+    letter-spacing:.7px; color:#000;
+    font-size:clamp(26px,2.6vw,84px);
+  }
+  .hero-title small{
+    display:block; letter-spacing:.7px;
+    font-family:"EB Garamond",; font-weight:850;
+    font-size:clamp(22px,5.4vw,35px)
+  }
+  .cta{
+    margin-top:32px; display:inline-flex; align-items:center; justify-content:center;
+    padding:14px 22px; border-radius:10px; border:2px solid var(--accent);
+    color:var(--accent); background:#fff; text-decoration:none; font-weight:800;
+    transition:background .25s,color .25s,transform .12s
+  }
+  .cta:hover{background:var(--accent);color:#fff;transform:translateY(-2px)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+
+  /* ===== Secciones ===== */
+  section{scroll-margin-top:80px;padding:56px 0}
+  h2{font-size:clamp(22px,4.6vw,34px);margin:0 0 12px}
+  .section-lead{color:#444;margin:0 0 26px}
+  .center{max-width:1000px;margin:0 auto 28px;text-align:center}
+  .reveal{opacity:0;transform:translateY(18px)}
+  .reveal.shown{opacity:1;transform:none;transition:opacity .6s ease,transform .6s ease}
+
+  /* ===== Quiénes somos ===== */
+  #quienes-somos .qs-grid{display:grid;gap:26px;grid-template-columns:1fr}
+  @media (min-width:980px){#quienes-somos .qs-grid{grid-template-columns:repeat(3,1fr)}}
+  .qs-card{background:#fff;border:2px solid #ececec;border-radius:12px;padding:26px 22px;box-shadow:var(--shadow-sm)}
+  .qs-card h3{
+    margin:0 0 12px;font-size:clamp(18px,3vw,22px);
+    font-family:"Cinzel",serif;letter-spacing:.3px
+  }
+
+  /* ===== Categorización con BRILLO visible ===== */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
+  @media (min-width:980px){.grid{grid-template-columns:repeat(4,1fr);gap:26px}}
+  .card{
+    position:relative;background:#fff;border:1px solid var(--card-border);
+    border-radius:14px;overflow:hidden;
+    box-shadow:
+      0 10px 22px rgba(0,0,0,.08),
+      0 0 28px rgba(var(--cat-glow-rgb), .48),
+      0 0 64px rgba(var(--cat-glow-rgb), .36);
+    transition:box-shadow .18s ease, transform .12s ease;
+  }
+  .card:hover{
+    transform:translateY(-2px);
+    box-shadow:
+      0 12px 26px rgba(0,0,0,.10),
+      0 0 36px rgba(var(--cat-glow-rgb), .58),
+      0 0 86px rgba(var(--cat-glow-rgb), .44);
+  }
+  .card .thumb{aspect-ratio:16/10;background:#fafafa;display:grid;place-items:center;border-bottom:1px solid var(--card-border)}
+  .card .thumb img{width:100%;height:100%;object-fit:contain;padding:12px}
+  .card .body{padding:22px;display:flex;flex-direction:column;gap:12px}
+  .tag{display:inline-flex;align-items:center;gap:8px;font-weight:800}
+  .tag .dot{width:10px;height:10px;border-radius:999px;background:#0a66ff}
+  .btn{appearance:none;border:0;cursor:pointer;background:#111;color:#fff;padding:12px 14px;border-radius:10px;font-weight:570;width:fit-content;text-decoration:none}
+  .btn:hover{background:#000}
+
+  /* ===== Participantes ===== */
+  .panel{display:none}
+  .panel.active{display:block}
+  .panel h2{text-align:center;margin-bottom:8px}
+  .panel-search{max-width:720px;margin:0 auto 22px;display:flex;justify-content:center;position:relative}
+  .panel-search input{width:100%;max-width:600px;padding:14px 16px;border-radius:12px;border:2px solid #d9d9d9;background:#fff;outline:none;text-align:center}
+  .ac-list{position:absolute;top:100%;left:50%;transform:translateX(-50%);width:min(600px,96vw);background:#fff;border:2px solid #ececec;border-radius:12px;margin-top:8px;box-shadow:var(--shadow-sm);display:none;max-height:240px;overflow:auto;z-index:50}
+  .ac-list.show{display:block}
+  .ac-item{padding:10px 12px;cursor:pointer;border-top:1px solid #f2f2f2}
+  .ac-item:first-child{border-top:0}
+  .ac-item:hover{background:#f7f7f7}
+  .no-results{color:#666;text-align:center;margin-top:10px;display:none}
+  .list{display:grid;grid-template-columns:1fr;gap:16px;max-width:720px;margin:0 auto;padding-left:0;justify-items:center}
+  @media (min-width:720px){.list{grid-template-columns:repeat(2,minmax(260px,1fr));max-width:none;justify-items:stretch}}
+  .list li{list-style:none;padding:16px 18px;border-radius:12px;background:#fff;border:2px solid #e7e7e7;text-align:center;width:100%}
+  .list li.ascenso{background:linear-gradient(180deg,#eafff6,#d8fff0);border-color:#a6f3d6;position:center}
+  .list li.ascenso::after{content:"PRONTA ASCENCIÓN";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#16a34a;color:#05351d;font-weight:800;font-size:12px;padding:2px 8px;border-radius:999px;box-shadow:var(--shadow-sm)}
+
+  /* ===== Marcas ===== */
+  .brands-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+  @media (min-width:700px){.brands-grid{grid-template-columns:repeat(3,1fr)}}
+  @media (min-width:1000px){.brands-grid{grid-template-columns:repeat(4,1fr)}}
+  .brand-card{background:#fff;border:2px solid #ececec;border-radius:12px;padding:26px;display:grid;place-items:center;box-shadow:var(--shadow-sm);transition:transform .15s, box-shadow .2s}
+  .brand-card:hover{transform:translateY(-2px) scale(1.01); box-shadow:0 14px 26px rgba(0,0,0,.12)}
+  .brand-card img{width:100%;height:190px;object-fit:contain}
+  @media (min-width:900px){.brand-card img{height:200px}}
+
+  /* ====== HEADER: centrar título en móvil con logo a la izquierda ====== */
+  @media (max-width: 768px){
+    .nav{ position: relative; }
+    .brand .title{ visibility: hidden; } /* mantiene el espacio del logo, oculta texto */
+    .nav::before{
+      content: "AOTAP";
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      font-family: "Cinzel", serif;
+      font-weight: 700; letter-spacing: .6px;
+      color: #fff; pointer-events: none; white-space: nowrap;
+    }
+  }
+
+  /* ====== QUIÉNES SOMOS: más sombra en tarjetas ====== */
+  .qs-card{
+    border: 2px solid #e6e6e6;
+    box-shadow:
+      0 10px 28px rgba(0,0,0,.10),
+      0 2px 28px rgba(0,0,0,.06);
+    background:#fff;
+  }
+  #quienes-somos .qs-grid{ gap: 28px; }
+  .qs-card{ padding: 28px 24px; }
+
+  /* Centrar Misión y Visión cuando solo hay 2 tarjetas */
+#quienes-somos .qs-grid{
+  /* ancho propio para centrar el conjunto */
+  max-width: 1120px;      /* ajusta si quieres más/menos ancho */
+  margin: 0 auto;         /* centra el grid como bloque */
+  justify-items: center;  /* centra cada tarjeta cuando quede una por fila */
+}
+
+@media (min-width: 980px){
+  #quienes-somos .qs-grid{
+    /* EXACTO: dos columnas y el conjunto centrado */
+    grid-template-columns: repeat(2, minmax(320px, 520px));
+    justify-content: center; /* centra las dos columnas en el ancho disponible */
+    gap: 32px;               /* espacio entre tarjetas */
+  }
+  #quienes-somos .qs-card{
+    width: 100%;             /* que cada tarjeta use su columna completa */
+  }
+}
+/* ====== LOGO y TÍTULO un poco más grandes ====== */
+header .brand img{
+  width: 48px;   /* antes 36px — súbelo si quieres más */
+  height: 48px;
+  object-fit: contain;
+}
+
+header .brand .title{
+  font-size: clamp(20px, 2.1vw, 28px); /* sube 28→30 si lo quieres más grande */
+  letter-spacing: .7px;
+  white-space: nowrap; /* evita salto de línea */
+}
+
+/* Algo más de alto a la barra para que respire */
+header .nav{ padding: 18px 0; }
+
+/* ====== MÓVIL: logo a la izquierda y título centrado ====== */
+@media (max-width: 800px){
+  header .nav{ position: relative; }
+  header .brand .title{ visibility: hidden; } /* oculta texto interno, mantiene logo */
+
+  /* Texto centrado en móvil (cámbialo si quieres otro nombre) */
+  header .nav::before{
+    content: "AOTAP";
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    font-family: "Cinzel", serif;
+    font-weight: 800; letter-spacing: .7px;
+    color: #fff; white-space: nowrap; pointer-events: none;
+    font-size: clamp(16px, 5.4vw, 22px); /* ajusta tamaño en móvil */
+  }
+
+  /* logo apenas más chico en móviles muy pequeños (opcional) */
+  header .brand img{ width: 50px; height: 50px; }
+}
+/* Más espacio debajo del header en la vista de Marcas */
+#view-brands .container{
+  padding-top: 10px;   /* súbelo/bájalo a tu gusto: 24–64px */
+}
+#view-brands h2.center{
+  margin-top: 8px;     /* evita que el h2 quede pegado */
+}
+/* ===== Centrar botones "Ver participantes" en MÓVIL ===== */
+@media (max-width: 768px){
+  /* Centra el contenido de la tarjeta */
+  .card .body{
+    align-items: center;           /* centra todo lo que hay dentro */
+  }
+
+  /* Botón centrado y con ancho controlado */
+  .card .body .btn{
+    display: block;                /* permite usar margin auto */
+    margin: 10px auto 0;           /* centra horizontalmente */
+    width: min(280px, 90%);        /* no se pega a los bordes */
+    text-align: center;            /* texto centrado */
+    white-space: normal;           /* permite salto de línea */
+    border-radius: 12px;           /* por si se cortaba la esquina */
+  }
+}
+/* ===== Quiénes somos con el mismo estilo de tarjeta (Misión / Visión) ===== */
+#quienes-somos .center{
+  /* aspecto de tarjeta */
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 28px rgba(0,0,0,.10),
+    0 2px 8px rgba(0,0,0,.06);
+  padding: 28px 24px;
+
+  /* alineación como las tarjetas (no centrado) */
+  text-align: left;
+
+  /* mismo ancho y separación que las otras */
+  max-width: 1120px;
+  margin: 0 auto 28px;
+}
+
+/* Título con la misma tipografía elegante de las tarjetas */
+#quienes-somos .center h2{
+  font-family: "Cinzel", serif;  /* misma fuente que usas en Misión/Visión */
+  font-weight: 700;
+  letter-spacing: .3px;
+  font-size: clamp(22px, 3.6vw, 28px);
+  margin: 0 0 10px;
+}
+
+/* Texto introductorio: un poco más oscuro y sin demasiado espacio abajo */
+#quienes-somos .center .section-lead{
+  color: #222;
+  margin: 0;
+}
+/* MÓVIL: reduce el texto del botón "Ver participantes" */
+@media (max-width: 768px){
+  .card .body .btn{
+    font-size: 10px;      /* prueba 14–15px */
+    line-height: 1.2;     /* compacta el alto de línea */
+    padding: 12px 14px;   /* un poco menos de padding */
+  }
+}
+/* ===== Participantes: 2 cols en móvil, 3 cols en PC ===== */
+/* Base = móvil */
+.list{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 12px;
+  max-width: none;          /* quita el tope que tenías */
+  justify-items: stretch;   /* que cada casilla use su columna */
+}
+
+/* Casillas un poco más compactas en móvil */
+.list li{
+  padding: 12px 10px;
+  font-size: 14px;
+}
+
+/* Tablets: mantenemos 2 columnas cómodas */
+@media (min-width: 720px){
+  .list{
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .list li{
+    padding: 14px 12px;
+    font-size: 15px;
+  }
+}
+
+/* PC/Laptops grandes: 3 columnas */
+@media (min-width: 980px){
+  .list{
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .list li{
+    padding: 16px 14px;
+    font-size: 15px;
+  }
+}
+
+/* (Opcional) un poquito más de aire si se pega al header al abrir por hash */
+
+#view-part .container{ padding-top: 24px; }
+/* ===== Reducir tamaño de la pill de ascenso en móviles ===== */
+@media (max-width: 768px){
+  .list li.ascenso::after{
+    /* tamaño más pequeño y en 1 sola línea */
+    font-size: 11.5px;
+    line-height: 1;
+    padding: 4px 10px;
+    white-space: nowrap;      /* evita que se corte en dos líneas */
+    top: -10px;               /* ajusta la altura del “globo” */
+    border-radius: 999px;
+  }
+
+  /* si quieres que la tarjeta también sea un poco más compacta */
+  .list li{
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+}
+
+/* Móviles muy estrechos (≤ 420px): aún más chiquito */
+@media (max-width: 420px){
+  .list li.ascenso::after{
+    font-size: 10.5px;
+    padding: 3px 8px;
+    top: -9px;
+  }
+}
+/* Icono a la izquierda de cada participante (PC y móvil) */
+.list li{
+  position: relative;              /* para que el badge "Ascenso" siga bien posicionado */
+  display: flex;                   /* alinea icono + texto */
+  align-items: center;
+  gap: 12px;                       /* espacio entre icono y texto */
+}
+
+/* Dibujamos el icono con ::before */
+.list li::before{
+  content: "";
+  flex: 0 0 26px;                  /* tamaño del icono en PC */
+  width: 26px;
+  height: 26px;
+  background: url("https://i.pinimg.com/736x/43/14/0a/43140a3803e5f1b39c1ffac1a35a3ec7.jpg") no-repeat center / contain;
+  filter: grayscale(100%);         /* opcional: neutro */
+  opacity: .9;                     /* opcional: un pelín más suave */
+}
+
+/* Móvil: icono un poco más chico y menor separación */
+@media (max-width: 768px){
+  .list li{ gap: 10px; }
+  .list li::before{
+    flex-basis: 20px;
+    width: 20px; height: 20px;
+  }
+}
+
+/* Si alguna lista no debe mostrar icono, añade la clase .no-icon a su <ul> */
+.list.no-icon li::before{ display: none; }
+/* Nota pequeña centrada bajo el título de cada panel de participantes */
+.panel h2::after{
+  content: "LISTA ACTUALIZADA — HASTA OCTUBRE 2025";
+  display: block;
+  margin-top: 6px;
+  text-align: center;
+  font-size: 9px;          /* tamaño pequeño */
+  letter-spacing: .08em;    /* un poco de tracking */
+  color: #6b7280;           /* gris suave */
+  text-transform: uppercase;
+  font-weight: 600;
+}
+/* ===== Cintilla fija en PARTICIPANTES (título + "lista actualizada") ===== */
+
+/* Ajusta este valor si tu header es más alto o más bajo */
+:root{
+  --panel-stick-top: 110px;   /* espacio desde arriba para no chocar con el header */
+}
+
+#view-part .panel h2{
+  position: sticky;
+  top: var(--panel-stick-top);
+  z-index: 500;                     /* por encima de la lista */
+  background: #fff;                 /* para tapar lo que pasa por debajo */
+  margin: 0 0 14px;                 /* un poco de respiro con el buscador */
+  padding: 14px 0 18px;             /* incluye la línea de “LISTA ACTUALIZADA” */
+  text-align: center;
+  box-shadow: 0 6px 12px rgba(0,0,0,.06); /* sutil sombra inferior */
+  border-radius: 10px;              /* opcional, para que parezca una banda */
+}
+
+/* La línea "LISTA ACTUALIZADA — OCTUBRE 2025" ya sale del ::after del h2.
+   Solo la afinamos un poquito cuando está sticky */
+#view-part .panel h2::after{
+  display: block;
+  margin-top: 6px;
+}
+
+/* En móviles dejamos un poco menos de offset */
+@media (max-width: 768px){
+  :root{ --panel-stick-top: 66px; }
+}
+/* MÓVIL: más espacio entre el header principal y la cintilla de la categoría */
+@media (max-width: 768px){
+  :root{
+    /* sube/baja este valor si hace falta */
+    --panel-stick-top: calc(92px + env(safe-area-inset-top)); 
+  }
+
+  /* un pelín más de aire dentro de la banda */
+  #view-part .panel h2{
+    padding: 16px 0 18px;
+  }
+}
+
+/* (muy chico) teléfonos ≤ 420px: un poco más por seguridad */
+@media (max-width: 420px){
+  :root{
+    --panel-stick-top: calc(100px + env(safe-area-inset-top));
+  }
+}
+/* Participantes en MAYÚSCULAS (solo visual) */
+.list li{
+  text-transform: uppercase;
+  letter-spacing: .2px;
+}
+
+/* Mantén la etiqueta (Ascenso / Pronta Ascensión) con su propio estilo */
+.list li.ascenso::after{
+  text-transform: none;
+}
+/* === Centrar nombres en tarjetas de participantes (PC y móvil) === */
+.list li{
+  position: relative;
+  display: flex;
+  align-items: center;          /* centra verticalmente el texto */
+  justify-content: center;      /* centra horizontalmente el texto */
+  text-align: center;           /* si hay 2 líneas, que se centren */
+  width: 100%;
+  padding-left: clamp(40px, 3.2vw, 56px);  /* espacio para el icono */
+  line-height: 1.2;
+  white-space: normal !important;          /* permite 2 líneas si hace falta */
+}
+
+/* Icono a la izquierda, centrado verticalmente */
+.list li::before{
+  position: absolute;
+  left: clamp(10px, 1.2vw, 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+
+/* Ajuste fino para móviles */
+@media (max-width: 768px){
+  .list li{
+    padding-left: 44px;         /* un poco menos de sangría */
+    font-size: 15.5px;          /* sube/baja si hace falta */
+  }
+}
+
+</style>
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#inicio" aria-label="Ir al inicio">
+        <img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/LOGO-AOTAP.webp" alt="Logo" width="36" height="36" loading="lazy"/>
+        <div class="title">AOTAP</div>
+      </a>
+      <button class="burger" id="burger" aria-expanded="false" aria-controls="mainmenu">☰</button>
+      <ul class="menu" id="mainmenu">
+        <li><a href="#quienes-somos">Quiénes somos</a></li>
+        <li><a href="#categorizacion">Categorización</a></li>
+        <li><a href="#marcas">Comunidades</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- ===== VISTA: HOME ===== -->
+  <div id="view-home" class="view active">
+    <!-- Cambia la imagen del fondo aquí -->
+    <section class="hero-wrap" id="hero" data-bg="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/Copia-de-Green-and-White-Modern-Bold-Tennis-Course-Sport-Presentation-7.jpg">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-card">
+        <div class="kicker"></div>
+        <h1 class="hero-title">BIENVENIDO A LA<small></small>AOTAP</h1>
+        <a class="cta" href="https://whatsapp.com/channel/0029Vb6DHdt5Ejxw0Buf3j42" target="_blank" rel="noopener">UNETE A NUESTRO CANAL</small>
+        </a>
+      </div>
+    </section>
+
+    <main class="container">
+     
+      <!-- Categorización (glow visible) -->
+      <section id="categorizacion" class="reveal" aria-labelledby="cat-title">
+        <div class="center">
+          <h2 id="cat-title">CATEGORIZACIÓN</h2>
+          <p class="section-lead">Elige una categoría para ver la lista de participantes.</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <div class="thumb"><img src="https://i.pinimg.com/1200x/12/e1/e5/12e1e5ec1a4e86e033ff82abea08f314.jpg" alt="Logo 5TA P" loading="lazy"/></div>
+            <div class="body">
+              <div class="tag"><span class="dot"></span>5TA P</div>
+              <a class="btn" href="#participantes-5ta-p">Ver Participantes</a>
+            </div>
+          </article>
+          <article class="card">
+            <div class="thumb"><img src="https://i.pinimg.com/1200x/12/e1/e5/12e1e5ec1a4e86e033ff82abea08f314.jpg" alt="Logo 5TA B" loading="lazy"/></div>
+            <div class="body">
+              <div class="tag"><span class="dot"></span>5TA B</div>
+              <a class="btn" href="#participantes-5ta-b">Ver Participantes</a>
+            </div>
+          </article>
+          <article class="card">
+            <div class="thumb"><img src="https://i.pinimg.com/1200x/12/e1/e5/12e1e5ec1a4e86e033ff82abea08f314.jpg" alt="Logo 5TA A" loading="lazy"/></div>
+            <div class="body">
+              <div class="tag"><span class="dot"></span>5TA A</div>
+              <a class="btn" href="#participantes-5ta-a">Ver Participantes</a>
+            </div>
+          </article>
+          <article class="card">
+            <div class="thumb"><img src="https://i.pinimg.com/1200x/12/e1/e5/12e1e5ec1a4e86e033ff82abea08f314.jpg" alt="Logo 4TA" loading="lazy"/></div>
+            <div class="body">
+              <div class="tag"><span class="dot"></span>4TA</div>
+              <a class="btn" href="#participantes-4ta">Ver Participantes</a>
+            </div>
+          </article>
+        </div>
+      </section>
+      <!-- Quiénes somos -->
+      <section id="quienes-somos" class="reveal">
+        <div class="center">
+          <h2>Quiénes somos</h2>
+          <p class="section-lead">
+            Somos una Asociación de Organizadores de Tenis Amateur del Perú. Trabajamos juntos para que cada jugador viva torneos bien organizados, con transparencia, respeto y un auténtico espíritu deportivo.
+          </p>
+        </div>
+        <div class="qs-grid">
+          <article class="qs-card"><h3>Misión</h3><p>Fomentar el desarrollo del tenis amateur en el Perú a través de la unión de organizadores comprometidos con la calidad, la transparencia y la equidad en la competencia. Buscamos brindar respaldo y estándares comunes que garanticen una mejor experiencia para todos los jugadores.</p></article>
+          <article class="qs-card"><h3>Visión</h3><p>Construir un entorno donde cada jugador de tenis amateur disfrute de torneos bien organizados, justos y con sentido de comunidad. Queremos que cada participante se sienta parte de algo más grande: una red de organizadores que trabajan con amistad, respeto y pasión para hacer del tenis una experiencia cada vez mejor.</p></article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== VISTA: PARTICIPANTES ===== -->
+  <div id="view-part" class="view">
+    <main class="container">
+      <section id="participantes-5ta-p" class="panel">
+        <h2>Categorización - 5TA Principiante</h2>
+        <div class="panel-search"><input type="search" class="search" placeholder="Buscar en 5TA P..." aria-label="Buscar en 5TA P"><div class="ac-list" role="listbox"></div></div>
+        <ul class="list">
+          <li class="ascenso">ANTHONY AMARO</li>
+          <li class="ascenso">CESAR ALIPAZAGA</li>
+          <li class="ascenso">CESAR ALVARADO</li>
+          <li class="ascenso">FAVIO TORRES</li>
+          <li class="ascenso">IVONNE LAZO</li>
+          <li class="ascenso">JENNIFER FRIAS</li>
+          <li class="ascenso">JORGE CHANG</li>
+          <li class="ascenso">LUIS CARRILLO</li>
+          <li class="ascenso">MANUEL JIMENEZ</li>
+          <li class="ascenso">MILIN GRANDA</li>
+          <li class="ascenso">SEBASTIAN HORNA</li>
+          <li class="ascenso">SERGIO CARRILLO</li>
+          <li class="ascenso">VICTOR RODRIGUEZ</li>
+          <li class="ascenso">ZIANI ECHEVARRIA</li>
+          <li>AARON BALLESTEROS</li>
+          <li>ADRIÁN VILLENA</li>
+          <li>ADRIANA HUAMANÍ</li>
+          <li>ADRIANA VILLAFUERTE</li>
+          <li>ALBERTO JAIME</li>
+          <li>ALDO MORALES</li>
+          <li>ALEJANDRO CARRILLO</li>
+          <li>ALEJANDRO CORDERO</li>
+          <li>ALEJANDRO ROMAN</li>
+          <li>ALESSIO CASTELLANO</li>
+          <li>ALEX ASPILCUETA</li>
+          <li>ALEX CASTRO</li>
+          <li>ALEX TORRES</li>
+          <li>ALEXANDER DONAIRE</li>
+          <li>ALEXANDRA ARAPA</li>
+          <li>ALEXIS MEDINA</li>
+          <li>ALFONSO PAUCAR</li>
+          <li>ALFREDO CÁCERES</li>
+          <li>ALONSO CASTRO</li>
+          <li>ALVARO SANTA CRUZ</li>
+          <li>ANA CHÁVEZ</li>
+          <li>ANDERSON BARBOZA</li>
+          <li>ANDREA VARGAS</li>
+          <li>ANDREA ZERPA</li>
+          <li>ANGELICA VASQUEZ</li>
+          <li>ANGELO NAVARRO</li>
+          <li>ARTURO BEJARANO</li>
+          <li>AXEEL DE LA CRUZ</li>
+          <li>BETTY BURGOS</li>
+          <li>BILL HINOSTROZA</li>
+          <li>BLAS FIGUEROA</li>
+          <li>BRUNO HERRERA</li>
+          <li>BRUNO RIOS</li>
+          <li>BRYAN PALOMINO</li>
+          <li>BYEONGJU SAONG</li>
+          <li>CAMILA BRAVO</li>
+          <li>CAMILA CONDORI</li>
+          <li>CAMILO RAMOS</li>
+          <li>CARLOS CAMPOS</li>
+          <li>CARLOS CHAMORRO</li>
+          <li>CARLOS OVIEDO</li>
+          <li>CARLOS PALOMINO</li>
+          <li>CARLOS PORTILLA</li>
+          <li>CARLOS QUISPE</li>
+          <li>CARLOS RIOS</li>
+          <li>CHRISTIAN  CARRANZA</li>
+          <li>CRISTIAN ARCE</li>
+          <li>CRISTOPHER SUCLUPE</li>
+          <li>DANIEL MANRIQUE</li>
+          <li>DANIEL RIVADENEYRA</li>
+          <li>DANIEL ROMERO</li>
+          <li>DANIEL VILLANUEVA</li>
+          <li>DAVID LOPEZ TINEO</li>
+          <li>DIANA PAREDES</li>
+          <li>DIEGO AYALA</li>
+          <li>DIEGO RUCOBA</li>
+          <li>DIEGO VILCHEZ</li>
+          <li>EDUARDO ALEXANDER</li>
+          <li>EDUARDO NUÑEZ</li>
+          <li>EDUARDO VILLALOBOS</li>
+          <li>EDWIN MUÑOZ</li>
+          <li>ELENA CCONISLLA</li>
+          <li>ELIAS HUAYTA</li>
+          <li>EZEQUIEL ALEJANDRO</li>
+          <li>FABRIZIO DIAZ</li>
+          <li>FABRIZIO PAREDES</li>
+          <li>FABRIZZIO SARA</li>
+          <li>FERNANDO DAVILA</li>
+          <li>FERNANDO ESCOBAR</li>
+          <li>FERNANDO TTITO</li>
+          <li>FIORELLA ALEJANDRIA</li>
+          <li>FIORELLA DURAND</li>
+          <li>FIORELLA LOAYZA</li>
+          <li>FRANCO VALVERDE</li>
+          <li>GERMAN IPARRAGUIRRE</li>
+          <li>GINO GALECIO</li>
+          <li>GONZALO ARRIOLA</li>
+          <li>GONZALO FALLA</li>
+          <li>GONZALO HIDALGO</li>
+          <li>GUSTAVO CASTRO</li>
+          <li>HECTOR CHUMPITAZ</li>
+          <li>HECTOR TUÑOQUE</li>
+          <li>HENRY ANCHAISE</li>
+          <li>HERNAN CAVALIE</li>
+          <li>HUGO FERNANDEZ</li>
+          <li>HUMBERTO SALDAÑA</li>
+          <li>ITALO REGALADO</li>
+          <li>JAZMIN SUCAPUCA</li>
+          <li>JEAN PAUL PAJUELO</li>
+          <li>JEFFERY MONTES</li>
+          <li>JHERSON PONCE</li>
+          <li>JHON MICCELLI</li>
+          <li>JIMMY MALDONADO</li>
+          <li>JOAO DE LA CRUZ</li>
+          <li>JOAQUÍN ARIAS</li>
+          <li>JOAQUÍN GARCÍA</li>
+          <li>JONATHAN ESTEBAN</li>
+          <li>JONATHAN PAREDES</li>
+          <li>JORDAN CERVANTES</li>
+          <li>JORDÁN YARANGA</li>
+          <li>JORGE ARAOZ</li>
+          <li>JORGE BRAVO</li>
+          <li>JORGE ÑAHUI</li>
+          <li>JORGE VENEGAS</li>
+          <li>JORVIN SILVA</li>
+          <li>JOSE ARANDA</li>
+          <li>JOSE CASTRO</li>
+          <li>JOSE LOPEZ</li>
+          <li>JOSE ROJAS</li>
+          <li>JOSE TORRES</li>
+          <li>JOSHUE HUAMANI</li>
+          <li>JUAN BURGOS</li>
+          <li>JUAN DEL CARPIO</li>
+          <li>JUAN DIAZ</li>
+          <li>JUAN GOYCOCHEA</li>
+          <li>JULIETA AROTAYPE</li>
+          <li>JULIO GONZALES</li>
+          <li>JULIO ITURRIAGA</li>
+          <li>JUNIOR ASMAT</li>
+          <li>KATHERINE CORNEJO</li>
+          <li>KEVIN CARLOS</li>
+          <li>KEVIN FARFÁN</li>
+          <li>LEONARDO BREÑA</li>
+          <li>LINO CCACCYA</li>
+          <li>LUCIA BREÑA</li>
+          <li>LUCIA MAMANI</li>
+          <li>LUIS CANALES</li>
+          <li>LUIS GONZALES</li>
+          <li>LUIS GUTIERREZ</li>
+          <li>LUIS MAURICIO</li>
+          <li>LUIS RIVERA</li>
+          <li>LUIS ZEBALLOS</li>
+          <li>MANUEL ACUÑA</li>
+          <li>MANUEL MONCADA</li>
+          <li>MANUEL TEJADA</li>
+          <li>MARCO ASPILCUETA</li>
+          <li>MARCO BRUGGMANN</li>
+          <li>MARCO SAAVEDRA</li>
+          <li>MARCO VILLANUEVA</li>
+          <li>MARIA HUAMÁN</li>
+          <li>MARTIN CIFUENTES</li>
+          <li>MARTIN LIZARRAGA</li>
+          <li>MATIAS ASHCALLAY</li>
+          <li>MATT NIETO</li>
+          <li>MAURICIO PANDO</li>
+          <li>MELISSA VEGA</li>
+          <li>MERLY PALACIOS</li>
+          <li>MIGUEL CÁRDENAS</li>
+          <li>MIGUEL CASTILLO</li>
+          <li>MILAGROS GUTIÉRREZ</li>
+          <li>NICOLAS BATALLANOS</li>
+          <li>NOELIA TICONA</li>
+          <li>OSCAR PINEDO</li>
+          <li>OSWALDO VALENCIA</li>
+          <li>PABLO VALVERDE</li>
+          <li>PAOLA CHAMBI</li>
+          <li>PATRICIO SANCHEZ</li>
+          <li>PAULO ACOSTA</li>
+          <li>PEDRO PERALTA</li>
+          <li>PEDRO PUENTE</li>
+          <li>PEDRO RAMOS</li>
+          <li>PEDRO TELLO</li>
+          <li>PERCY PORTUGUEZ</li>
+          <li>PIERO RAMOS</li>
+          <li>RAUL CHAVEZ</li>
+          <li>RAUL PEÑA</li>
+          <li>RENATO RAMÍREZ</li>
+          <li>RENZO ACOSTA</li>
+          <li>RICHARD CARO</li>
+          <li>RODOLFO HUERTAS</li>
+          <li>RODRIGO ROMAN</li>
+          <li>RONALD LEON</li>
+          <li>ROSSANA MAGUIÑO</li>
+          <li>ROXANA CALLAPIÑA</li>
+          <li>SAMUEL PECHO</li>
+          <li>SANDRA SALAS</li>
+          <li>SANTIAGO SANCHEZ</li>
+          <li>SEBASTIAN ANCCO</li>
+          <li>SEBASTIAN EZETA</li>
+          <li>SEBASTIAN ORTEAGA</li>
+          <li>SEBASTIAN PORTOCARRERO</li>
+          <li>SUSANA ORDOÑEZ</li>
+          <li>TATIANA SULLCA</li>
+          <li>VALERIA LAMAS</li>
+          <li>VALERIA PUMA</li>
+          <li>VICENTE YAMASHIRO</li>
+          <li>VICTOR FLORES</li>
+          <li>VICTOR INOCENTE</li>
+          <li>WALTER CACERES</li>
+          <li>WILDERTH COSCA</li>
+          <li>WILSON CASTAÑEDA</li>
+          <li>WILSON QUISPE</li>
+          <li>YASSER ARROYO</li>
+          <li>YOUNDWOO KIM</li>
+        <div class="no-results">No se encontraron participantes en esta categoría.</div>
+      </section>
+
+      <section id="participantes-5ta-b" class="panel">
+        <h2>Categorización – 5TA B</h2>
+        <div class="panel-search"><input type="search" class="search" placeholder="Buscar en 5TA B..." aria-label="Buscar en 5TA B"><div class="ac-list" role="listbox"></div></div>
+        <ul class="list">
+          <li class="ascenso">ADRIAN SUYO</li>
+          <li class="ascenso">ALVARADO PEREDO</li>
+          <li class="ascenso">ARTURO ARIAS</li>
+          <li class="ascenso">FRAN RAZURI</li>
+          <li class="ascenso">JACKSON ROJAS</li>
+          <li class="ascenso">JUAN BECERRA</li>
+          <li class="ascenso">PERCY CAMPOS</li>
+          <li class="ascenso">RENZO ZAGARRA</li>
+          <li class="ascenso">SEBASTIAN VILLAFUERTE</li>
+          <li>ABEL TAPIA</li>
+          <li>ABIGAIL MALPARTIDA</li>
+          <li>ADRIAN ENCISO</li>
+          <li>ADRIÁN VILLENA</li>
+          <li>ADRIANA HUAMANÍ</li>
+          <li>ADRIANA VILLAFUERTE</li>
+          <li>ALBERTO DONAYRE</li>
+          <li>ALBERTO LIMO</li>
+          <li>ALDO MORALES</li>
+          <li>ALEJANDRO CARRILLO</li>
+          <li>ALEX CASTRO</li>
+          <li>ALEXANDRA ARAPA</li>
+          <li>ALEXIS MEDINA</li>
+          <li>ALFREDO CÁCERES</li>
+          <li>ALFREDO HUAMÁN</li>
+          <li>ALFREDO POMA</li>
+          <li>ALONDRA CATPO</li>
+          <li>ALONSO ESCALANTE</li>
+          <li>ALONSO SALHUANA</li>
+          <li>ÁLVARO CHUMBES</li>
+          <li>ANA ABUID</li>
+          <li>ANA FARFAN</li>
+          <li>ANDY ZARATE</li>
+          <li>ANGEL COLLANTES</li>
+          <li>ANGÉLICA APAZA</li>
+          <li>ANGELO TORRES</li>
+          <li>ANGHELO AGUAYO</li>
+          <li>ANTHONY AMARO</li>
+          <li>ANTHONY GONZALES</li>
+          <li>ANTHONY GUTIERREZ</li>
+          <li>ANTONIO CRUZ</li>
+          <li>ANTONIO ONOFRE</li>
+          <li>ARON ALDANA</li>
+          <li>ARTURO CARREÑO</li>
+          <li>ARTURO LLUEN</li>
+          <li>AXEL MEZA</li>
+          <li>BETSY SALAZAR</li>
+          <li>BLANCA DIAZ</li>
+          <li>BRAD HILARIO</li>
+          <li>BRENDA CALLA</li>
+          <li>BRIGITTE LLAMOCCA</li>
+          <li>BRISA HUALLPA</li>
+          <li>BRUNO ALCÁNTARA</li>
+          <li>BRUNO LEÓN</li>
+          <li>BRUNO ZAGAL</li>
+          <li>BRYAN LLAMOCCA</li>
+          <li>BRYAN VILLANUEVA</li>
+          <li>CAMILA VILLARREAL</li>
+          <li>CARLA CÓNDOR</li>
+          <li>CARLOS ADRIANO</li>
+          <li>CARLOS AVILA</li>
+          <li>CARLOS CIEZA</li>
+          <li>CARLOS DESPOSORIO</li>
+          <li>CARLOS EUSCATE</li>
+          <li>CARLOS GONZALES MIRANDA</li>
+          <li>CARLOS VILLANUEVA</li>
+          <li>CECILIA APAZA</li>
+          <li>CELIA CATIRE</li>
+          <li>CELIA MAMANI</li>
+          <li>CELINA HUAYNATE</li>
+          <li>CESAR ARRUNÁTEGUI</li>
+          <li>CESAR CORZO</li>
+          <li>CHRISTIAN CARDENAS</li>
+          <li>CHRISTIAN JIMENEZ</li>
+          <li>CHRISTIAN VILLANUEVA</li>
+          <li>CLAUDIA ALVARADO</li>
+          <li>CLAUDIA LAURA</li>
+          <li>CLAUDIA SALHUANA</li>
+          <li>CLAUDIA ZERPA</li>
+          <li>CRISTHIAN BELLIDO</li>
+          <li>CRISTHIAN GONZALES</li>
+          <li>CRISTHIAN REYES</li>
+          <li>RISTHIAN TINCO</li>
+          <li>CRISTIAN AMPUERO</li>
+          <li>CRISTIAN RODRIGUEZ</li>
+          <li>CRISTIAN SEGOVIA</li>
+          <li>CRISTIAN TOLEDO</li>
+          <li>DANIEL CÓRDOVA</li>
+          <li>DANIEL OYOLA</li>
+          <li>DANITZA AGUILAR</li>
+          <li>DARWIN TAIPE</li>
+          <li>DAYANA CHUQUIPIONDO</li>
+          <li>DÉBORA LLANOS</li>
+          <li>DELIA CCOPA</li>
+          <li>DENISSE CACERES</li>
+          <li>DIANA SOTOMAYOR</li>
+          <li>DIEGO ANCCO</li>
+          <li>DIEGO BENITEZ</li>
+          <li>DIEGO GONZALES</li>
+          <li>DIEGO HERNANDEZ</li>
+          <li>DIEGO MERCADO</li>
+          <li>DIEGO TAPIA</li>
+          <li>DIEGO VERA</li>
+          <li>EDGAR ARONI</li>
+          <li>EDISON MENESES</li>
+          <li>EDUARDO MENDOZA</li>
+          <li>EDUARDO QUISPEÑA</li>
+          <li>EDUARDO SALDARRIAGA</li>
+          <li>ELIAS JARA</li>
+          <li>ELIZABETH QUENTA</li>
+          <li>ELMER FLORES</li>
+          <li>ELOY GUEVARA</li>
+          <li>ELVIS MAMANI</li>
+          <li>ENRIQUE ALFARO</li>
+          <li>ENZO MEDRANO</li>
+          <li>ENZO MENDOZA</li>
+          <li>ERICK BARRERA</li>
+          <li>Erick Flores</li>
+<li>ERICK QUISPEHUARACA</li>
+<li>ERICK RAMOS</li>
+<li>ESTEFANY CUSI</li>
+<li>ESTHER TURPO</li>
+<li>EVELYN BARRIOS</li>
+<li>EVELYN QUISPEHUAMAN</li>
+<li>FABIAN SALAZAR</li>
+<li>FABIO HUAMANI</li>
+<li>FABRICIO MOLINA</li>
+<li>FABRICIO RAMOS</li>
+<li>FABRIZIO URBINA</li>
+<li>FERNANDO CIEZA</li>
+<li>FERNANDO TAPIA</li>
+<li>FIORELLA CANAZA</li>
+<li>Fiorella Godoy</li>
+<li>FLAVIA APAZA</li>
+<li>FLORENCIA TAIPE</li>
+<li>FRANCISCO PALOMINO</li>
+<li>GABRIEL GRADOS</li>
+<li>GABRIEL MESETH</li>
+<li>GABRIELA YUCRA</li>
+<li>GEANFRANCO MOLTENI</li>
+<li>Giancarlo Salazar Peña</li>
+<li>Giancarlo Tamayo</li>
+<li>GIANFRANCO QUISPE</li>
+<li>GIULIANA HUAYNATE</li>
+<li>GONZALO CHANG</li>
+<li>GONZALO MENA</li>
+<li>GONZALO PARRA</li>
+<li>GREYSI SULLCA</li>
+<li>GUSTAVO CCOPA</li>
+<li>GUSTAVO PINTO</li>
+<li>HARRY TUPAYACHI</li>
+<li>HECTOR FLORES</li>
+<li>HÉCTOR SUÁREZ</li>
+<li>Henry Garcia</li>
+<li>HENRY PAREDES</li>
+<li>HERNANDO DE LA GUERRA</li>
+<li>Hildebrando Castro-Pozo</li>
+<li>HUGO TICONA</li>
+<li>HUGO TORRES </li>
+<li>IGNACIO GOMEZ</li>
+<li>ISABELA TICONA</li>
+<li>IVÁN FLORES</li>
+<li>JAIME CASTILLO</li>
+<li>Jaime Vidal</li>
+<li>JAIR VILLENA</li>
+<li>JAVIER CORNEJO</li>
+<li>JAVIER GALARZA</li>
+<li>Javier Gomez</li>
+<li>JAZMÍN CACHI</li>
+<li>JAZMÍN MALCA</li>
+<li>JEAN PAUL ELLIS</li>
+<li>JEAN RIVERA</li>
+<li>JENNY MENDOZA</li>
+<li>JESUS DIESTRA</li>
+<li>JESÚS GAVILÁN</li>
+<li>Jesús Soriano</li>
+<li>JHENIFER CASTILLO</li>
+<li>JHON CUBA</li>
+<li>JHONATAN APAZA</li>
+<li>JHONATHAN VASQUEZ</li>
+<li>JHOSSELYN CHÁVEZ</li>
+<li>JIMENA VÁSQUEZ</li>
+<li>JIMMY AREVALO</li>
+<li>JOHN ROJAS</li>
+<li>Johnny Palma</li>
+<li>Jonathan Condori</li>
+<li>JONATHAN ESTEBAN</li>
+<li>JORGE AZALDEGUI</li>
+<li>Jorge Conislla</li>
+<li>JORGE CORNEJO</li>
+<li>JORGE REVUELTA</li>
+<li>JORGE SORIA</li>
+<li>JOSÉ CÁRDENAS</li>
+<li>JOSE EDUARDO</li>
+<li>JOSE EVANAN</li>
+<li>José Matos</li>
+<li>JOSE PAUCAR</li>
+<li>Joshua Gave</li>
+<li>JOSUE LAGOS</li>
+<li>JOSUÉ PÉREZ</li>
+<li>JUAN ALVARADO</li>
+<li>JUAN BENDEZU</li>
+<li>JUAN CAICAY</li>
+<li>JUAN DIEZ CANSECO</li>
+<li>Juan Jose Navarro</li>
+<li>JUAN LOYOLA</li>
+<li>JUAN REYNOSO</li>
+<li>JULIAN FIGUEROA</li>
+<li>JULIO JARAMILLO</li>
+<li>JULIO SIGUAS</li>
+<li>JULIO VILCHEZ</li>
+<li>Junior Asmat</li>
+<li>KAREN MAQUERA</li>
+<li>KARINA RIVAS</li>
+<li>KARINA TURPO</li>
+<li>KARITO DOMINGUEZ</li>
+<li>Karla Bozzo</li>
+<li>KARLA VILCA</li>
+<li>KATHERINE HUARACHI</li>
+<li>KATTY VALDEZ</li>
+<li>Kevin Gave</li>
+<li>KLAUS LOZANO</li>
+<li>LEONARDO PERALTA</li>
+<li>LESLIE CANAZA</li>
+<li>LIAM MALMA</li>
+<li>LIDIA SULLÓN</li>
+<li>LILIANA UCHARIMA</li>
+<li>LISSET CONTRERAS</li>
+<li>LIZETH VARGAS</li>
+<li>LORENA QUISPEHUAMAN</li>
+<li>LUANA PEÑALOZA</li>
+<li>LUCAS CÓRDOVA</li>
+<li>LUCAS HUARCAYA</li>
+<li>LUCAS VILLAVICENCIO</li>
+<li>LUCÍA BUSTAMANTE</li>
+<li>LUIS ALARCÓN</li>
+<li>LUIS ALAYO</li>
+<li>Luis Aspilicueta</li>
+<li>Luis Cam Lay</li>
+<li>Luis Estacio</li>
+<li>LUIS HERRERA</li>
+<li>LUIS JARA</li>
+<li>LUIS MORALES DELGADO</li>
+<li>LUIS VASQUEZ</li>
+<li>Magno Rios</li>
+<li>MANUEL MALLMA</li>
+<li>MARCELO CAÑARI</li>
+<li>MARCELO LAVADO</li>
+<li>MARCELO PEREZ</li>
+<li>MARCELO PUMAHUALA</li>
+<li>MARCO SALAZAR</li>
+<li>Marco Zanini</li>
+<li>MARIA ELENA AVALOS</li>
+<li>MARIANELA YUCRA</li>
+<li>Mario Cruz</li>
+<li>Mario Gomero</li>
+<li>MARLENY RIVERA</li>
+<li>MARTHA VASQUEZ</li>
+<li>MATEO MARTINEZ</li>
+<li>MATHIAS OSORIO</li>
+<li>MATÍAS REYES</li>
+<li>MAURICIO ALARCÓN</li>
+<li>MAURICIO CABRERA</li>
+<li>MAURICIO DODERO</li>
+<li>MAURICIO PEÑA</li>
+<li>MAURO AYARZA</li>
+<li>MAX DIESTRA</li>
+<li>MAXIMO GALLO</li>
+<li>MAXWELL VENTURA</li>
+<li>MAYRA COLQUE</li>
+<li>MAYRA YANAHUAYA</li>
+<li>MELINA QUISPEÑA</li>
+<li>MELISSA HUARCAYA</li>
+<li>MERY HUAYHUA</li>
+<li>MICHAEL VALVERDE</li>
+<li>Miguel Deustua</li>
+<li>MIGUEL HUAYLLANI</li>
+<li>MIGUEL MEDINA</li>
+<li>MIGUEL YARANGA</li>
+<li>MILAGROS APAZA</li>
+<li>MILAGROS UCEDA</li>
+<li>Milmarck Fernandez</li>
+<li>MÓNICA HUAMANI</li>
+<li>NATALIA TITO</li>
+<li>NATASHA CCORAHUA</li>
+<li>NATASHA CUSI</li>
+<li>NAYELI TICONA</li>
+<li>NELLY CCAPA</li>
+<li>NELSON ROJAS</li>
+<li>NICOLÁS CALISAYA</li>
+<li>Nicolas Gonzales</li>
+<li>NICOLAS NUÑEZ</li>
+<li>Nike Calle</li>
+<li>Nilton Huamanyauri </li>
+<li>NOEMI PACHECO</li>
+<li>ÓSCAR MAMANI</li>
+<li>OSCAR ORTIZ</li>
+<li>Oscar Paredes</li>
+<li>PAMELA CHURA</li>
+<li>PAOLO DURAND</li>
+<li>PATRICIO LLANQUI</li>
+<li>PAULO CALVANAPON</li>
+<li>PEDRO LAVI</li>
+<li>PEDRO OCAMPO</li>
+<li>PEPE JHONG</li>
+<li>Peter Grados</li>
+<li>PIERO ROJAS</li>
+<li>RAUL CUADROS</li>
+<li>RAUL HOSPINAL</li>
+<li>RAUL OLIVARES</li>
+<li>RAUL PORRAS</li>
+<li>RENATO MOSCOSO</li>
+<li>RENZO BARRANTES</li>
+<li>RENZO BENDEZU</li>
+<li>Renzo Ramos</li>
+<li>RICARDO HUAYTA</li>
+<li>RICARDO MENDOZA</li>
+<li>Ricardo Perez</li>
+<li>RICARDO ZEGARRA</li>
+<li>ROBERTO ORTEGA</li>
+<li>Roberto Sarmiento</li>
+<li>ROCÍO CHURATA</li>
+<li>ROCÍO QUISPELUQUE</li>
+<li>RODOLFO PARDO</li>
+<li>RODRIGO ASPILCUETA</li>
+<li>RODRIGO CACERES</li>
+<li>RODRIGO RAMOS</li>
+<li>Rodrigo Verano</li>
+<li>ROMINA ZARATE</li>
+<li>RONALD APAZA</li>
+<li>RONALD OBREGÓN</li>
+<li>RUBÉN SULLÓN</li>
+<li>SAMIR MEZA</li>
+<li>SANDRA CORDERO
+<li>SANTIAGO AVENDAÑO</li>
+<li>Sergio Aroni</li>
+<li>SERGIO HINOSTROZA</li>
+<li>SERGIO HUAMÁN</li>
+<li>SERGIO LIZANA</li>
+<li>SERGIO TORRES</li>
+<li>SHEYLA QUISPELUQUE</li>
+<li>SHIRLEY CORDOVA</li>
+<li>SOFÍA TITO</li>
+<li>STEPHANY CÁCERES</li>
+<li>THALÍA VILCA</li>
+<li>VANESSA POMA</li>
+<li>Vanessa Valdiviezo</li>
+<li>VERÓNICA YANA</li>
+<li>VICTOR CABRERA</li>
+<li>VICTOR JIMENEZ</li>
+<li>VICTOR MONTEVERDE</li>
+<li>Victor Piña</li>
+<li>VICTOR ZUMARI</li>
+<li>WALTER FERNANDEZ</li>
+<li>WENDY TORRES</li>
+<li>WILFREDO ZAGRA</li>
+<li>WILMER SANTILLÁN</li>
+<li>XIMENA UMERES</li>
+<li>YESSICA HUALLPA</li>
+<li>YULIANA LAURA</li>
+<li>MARCELO ROBLEDILLO</li>
+<li>JUAN ZAPATA</li>
+<li>JAIME FERNANDEZ</li>
+<li>DIEGO ALCAZAR</li>
+
+<div class="no-results">No se encontraron participantes en esta categoría.</div>
+      </section>
+
+      <section id="participantes-5ta-a" class="panel">
+        <h2>Categorización – 5TA A</h2>
+        <div class="panel-search"><input type="search" class="search" placeholder="Buscar en 5TA A..." aria-label="Buscar en 5TA A"><div class="ac-list" role="listbox"></div></div>
+        <ul class="list">
+<li>YULIANA VILCHEZ</li>
+<li>YULIANA TURPO</li>
+<li>YONY MIRANDA</li>
+<li>YESSICA CCOPA</li>
+<li>YAMILETH QUISPEHUARACA</li>
+<li>XIOMARA HUARCAYA</li>
+<li>WILMER PÉREZ</li>
+<li>WILI JIMENEZ</li>
+<li>VIVIANA MALCA</li>
+<li>VÍCTOR TAPULLIMA</li>
+<li>VICTOR PORTOCARRERO</li>
+<li>VERÓNICA TANTA</li>
+<li>VALERIA APAZA</li>
+<li>TATIANA HUAYHUA</li>
+<li>TANIA CUSI</li>
+<li>SHEYLA CHURA</li>
+<li>SHEYLA CATPO</li>
+<li>SEBASTIAN TRONCOSO</li>
+<li>SEBASTIAN MOREYRA</li>
+<li>SEBASTIÁN HUAYTA</li>
+<li>SANTIAGO LLALLIHUAMAN</li>
+<li>SAMUEL MATOS</li>
+<li>ROSA CHURA</li>
+<li>RONALD CÓRDOVA</li>
+<li>ROMMEL EGÚSQUIZA</li>
+<li>RODRIGO TAPIA</li>
+<li>RODRIGO HERNANDEZ</li>
+<li>ROCÍO LLOCLLA</li>
+<li>ROCÍO CATACORA</li>
+<li>ROBIN SALDAÑA</li>
+<li>ROBERTO PEREDA</li>
+<li>RICARDO QUISPE</li>
+<li>RICARDO MAMANI</li>
+<li>RENZO PUMAHUALA</li>
+<li>RENZO LEVAGGI</li>
+<li>RENZO HUALLPA</li>
+<li>RENATTO GOYCOCHEA</li>
+<li>RENATO MALDONADO</li>
+<li>RAY ZEVALLOS</li>
+<li>RAÚL ZEGARRA</li>
+<li>RAÚL CAMARENA</li>
+<li>RAFAEL CAFFERATA</li>
+<li>PETER GALLARDO</li>
+<li>PEPE LORENZO </li>
+<li>PAULO ARANA</li>
+<li>PAOLA HUARCAYA</li>
+<li>PAMELA TURPO</li>
+<li>PAMELA CATPO</li>
+<li>PABLO HUARACHI</li>
+<li>PABLO CHIRINOS</li>
+<li>OSCAR ROSAS</li>
+<li>OMAR GARCÍA</li>
+<li>OMAR ENCISO </li>
+<li>OLIVER CURAY</li>
+<li>NOELIA CHÁVEZ</li>
+<li>NINO PAULINO</li>
+<li>NICOLE CALLA</li>
+<li>NICOLAS BATALLANOS</li>
+<li>NAYRA TICONA</li>
+<li>NATHALY ARAPA</li>
+<li>NATALIA CONDORI</li>
+<li>NATALIA CALLE</li>
+<li>NAPO LA TORRE</li>
+<li>MIRIAM MAQUERA</li>
+<li>MILAGROS MALCA</li>
+<li>MILAGROS LLANOS</li>
+<li>MILAGROS BLAS</li>
+<li>MIGUEL GUEVARA</li>
+<li>MIGUEL CENTENO</li>
+<li>MELISA MAMANI</li>
+<li>MELINA TICONA</li>
+<li>MAYRA HUAYTA</li>
+<li>MAURO GONZALES</li>
+<li>MAURICIO VILCA</li>
+<li>MAURICIO RODRIGUEZ</li>
+<li>MAURICIO CCOPA</li>
+<li>MATEO SALAS</li>
+<li>MARTIN LUCANO</li>
+<li>MARTÍN ALCÁNTARA</li>
+<li>MARLENE YANA</li>
+<li>MARÍA LAURA</li>
+<li>MARCO TUPAYACHI</li>
+<li>MARCO LOPEZ</li>
+<li>MARCO HUALLPA</li>
+<li>MARCO CARRANZA</li>
+<li>MARCELO RIVERA</li>
+<li>MANUEL RAMÍREZ</li>
+<li>MANUEL ÁVILA</li>
+<li>LUZMILA QUISPE</li>
+<li>LUZ HUAYHUA</li>
+<li>LUIS PALOMINO</li>
+<li>LUIS MORÁN</li>
+<li>LUIS GOMEZ</li>
+<li>LUIS FELIPE</li>
+<li>LUIS EDUARDO HURTADO</li>
+<li>LUIS CASTILLO</li>
+<li>LUCÍA PALOMINO</li>
+<li>LUCERO GUERRA</li>
+<li>LORENA APAZA</li>
+<li>LIZETH QUISPEÑA</li>
+<li>LIZBETH MENESES</li>
+<li>LEONARDO MAGUIÑA</li>
+<li>LEONARDO HUAMAN</li>
+<li>LEANDRO GARCIA</li>
+<li>LAURENT DELMAS</li>
+<li>KLAUS TALAVERANO</li>
+<li>KEVIN YANA</li>
+<li>KEVIN TINEO</li>
+<li>KEVIN SEGURA</li>
+<li>KEVIN ANTUNEZ</li>
+<li>KATHERINE TURPO</li>
+<li>JUNIOR ABANTO</li>
+<li>JULIO POMA</li>
+<li>JULIO HUAYLLANI</li>
+<li>JULIO ALARCON</li>
+<li>JULIO AHON</li>
+<li>JUAN VILLAVERDE</li>
+<li>JUAN MEREL</li>
+<li>JUAN GARCIA</li>
+<li>JUAN CARLOS MELENDEZ</li>
+<li>JUAN CARLOS CARRANZA</li>
+<li>JUAN AREVALO</li>
+<li>JOSHUA PEÑA</li>
+<li>JOSÉ TAQUIRI</li>
+<li>JOSE ROJAS</li>
+<li>JOSÉ RIVERA</li>
+<li>JOSÉ MARTÍN ESPINOZA</li>
+<li>JOSÉ LLAULLI</li>
+<li>JOSÉ LLAQUI</li>
+<li>JOSE ESCRIBA</li>
+<li>JORGE ROSADO</li>
+<li>JORGE PASCO</li>
+<li>JORGE LUIS VILCHEZ</li>
+<li>JORGE HUAYNATE</li>
+<li>JORGE AVELLANEDA</li>
+<li>JORGE ALVA</li>
+<li>JORDY GARCÍA</li>
+<li>JONATHAN GABRIEL</li>
+<li>JOHNY BACA</li>
+<li>JOHN MICCELLI</li>
+<li>JOHAN CABRERA</li>
+<li>JOEL JACOBO</li>
+<li>JOAQUIN MORANTE</li>
+<li>JOAQUÍN LLALLIHUAMAN</li>
+<li>JHOSSELYN CATACORA</li>
+<li>JHONATHAN REVILLA</li>
+<li>JHONATAN VÁSQUEZ</li>
+<li>JESÚS PRADO</li>
+<li>JESUS HUAMAN</li>
+<li>JESÚS DEL CARPIO</li>
+<li>JESÚS CCOPA</li>
+<li>JESUS CARRASCO</li>
+<li>JENNIFER CHAMBILLA</li>
+<li>JAZMÍN PAREDES</li>
+<li>JAVIER CASTRO</li>
+<li>IVAN TORIBIO</li>
+<li>HUGO MELGAR</li>
+<li>HUGO AYARZA</li>
+<li>HISAO HIGUCHI</li>
+<li>HECTOR MARTINEZ</li>
+<li>HÉCTOR LLANQUI</li>
+<li>HÉCTOR LLANQUI</li>
+<li>HARRY MEDINA</li>
+<li>GUSTAVO QUISPEÑA</li>
+<li>GUSTAVO CÓRDOVA</li>
+<li>GUILLERMO SANCHEZ</li>
+<li>GREYSI QUISPEHUAMAN</li>
+<li>GREYSI HUAYHUA</li>
+<li>GONZALO RIVERA </li>
+<li>GONZALO FLORES</li>
+<li>GIANFRANCO UGARELLI</li>
+<li>GIANCARLO SALINAS</li>
+<li>GABRIELA TICONA</li>
+<li>FRANCO QUENTA</li>
+<li>FRANCISCO PÉREZ</li>
+<li>FRANCISCO LLANQUI</li>
+<li>FLAVIA HUARCAYA</li>
+<li>FIORELLA CALLA</li>
+<li>FERNANDO SIERRA</li>
+<li>FERNANDO CATPO</li>
+<li>FAUSTINO AROSTE</li>
+<li>FABRICIO HUAYTA</li>
+<li>FABIO HUAMANÍ</li>
+<li>FABIO CAVASSA</li>
+<li>EVELYN SAENZ</li>
+<li>ESTEFANY CONDOR</li>
+<li>ESTEBAN UGALDE</li>
+<li>ERNESTO SALAZAR</li>
+<li>ERICK CÓRDOVA</li>
+<li>ENZO QUENTA</li>
+<li>ENZO MORALES</li>
+<li>ELVIS SANTILLÁN</li>
+<li>ELENA APAZA</li>
+<li>EDWIN GUEVARA</li>
+<li>EDWARD GAITAN</li>
+<li>EDUARDO TAMAYO</li>
+<li>EDUARDO FLORES MELGAREJO</li>
+<li>EDISON CATACORA</li>
+<li>EDGAR BARRIGA</li>
+<li>EDER PALOMINO</li>
+<li>EDDY CERRILLO</li>
+<li>DIEGO VALDIVIA</li>
+<li>DIEGO QUEZADA</li>
+<li>DIEGO PUMAHUALA</li>
+<li>DIEGO DELGADO</li>
+<li>DIEGO CRUZ</li>
+<li>DIANA COLQUE</li>
+<li>DAYANA MAMANI</li>
+<li>DAVIS ARTEAGA</li>
+<li>DAVID LOPEZ</li>
+<li>DAVID CUSI</li>
+<li>DARWIN HUARCAYA</li>
+<li>DANNY GUERRERO</li>
+<li>DANITZA YANA</li>
+<li>DANITZA SULLCA</li>
+<li>DANIELA QUENTA</li>
+<li>DANIELA LLANQUI</li>
+<li>DANIEL CALMET</li>
+<li>CRISTHIAN APAZA</li>
+<li>COLLEEN GIFFORD</li>
+<li>CLAUDIA HUARCAYA</li>
+<li>CLAUDIA CATIRE</li>
+<li>CHRISTIAN TINOCO</li>
+<li>CHRISTIAN ARELLANO</li>
+<li>CESAR POLO</li>
+<li>CESAR ARCE</li>
+<li>CELIA VILCA</li>
+<li>CECILIA POMA</li>
+<li>CAROLINA TUPAYACHI</li>
+<li>CAROLINA CÓNDOR</li>
+<li>CARLOS VERDEGUER</li>
+<li>CARLOS PAREDES</li>
+<li>CARLOS PAREDES</li>
+<li>CARLOS GERSTEIN</li>
+<li>CARLOS GARCIA</li>
+<li>CARLA PUMA</li>
+<li>CANDY ACERO</li>
+<li>CAMILA VILCA</li>
+<li>BRUNO TITO</li>
+<li>BRUNO AYARZA</li>
+<li>BRISA CUSIHUAMÁN</li>
+<li>ARTURO HUERTAS</li>
+<li>ARMATS GIARNELLY</li>
+<li>ARMANDO VILLENA</li>
+<li>ANTONIO SALAZAR</li>
+<li>ÁNGEL CONDORI</li>
+<li>ANDRÉS QUISPELUQUE</li>
+<li>ANDERSON MENDOZA</li>
+<li>ANAHÍ CUSI</li>
+<li>ANAHÍ CHURA</li>
+<li>ÁLVARO PEÑA</li>
+<li>ÁLVARO CARRASCO</li>
+<li>ALONSO CASTRO</li>
+<li>ALLAN VERÁSTEGUI</li>
+<li>ALFREDO HUAMANI</li>
+<li>ALFREDO ESCALANTE</li>
+<li>ALEXIS TORRES</li>
+<li>ALEXIS HUAYLLANI</li>
+<li>ALEXANDER RODRIGUEZ</li>
+<li>ALEJANDRO VELIT</li>
+<li>ALEJANDRO SAAVEDRA</li>
+<li>ALEJANDRO HUAMANI</li>
+<li>ALEJANDRO HERNANDEZ</li>
+<li>ALEJANDRO BODERO</li>
+<li>ALDO CASTILLO</li>
+<li>ALBERTO TICONA</li>
+<li>ADRIÁN CÓNDOR</li>
+<li>ADRIÁN AYALA</li>
+        <div class="no-results">No se encontraron participantes en esta categoría.</div>
+      </section>
+
+      <section id="participantes-4ta" class="panel">
+        <h2>Categorizacion – 4TA</h2>
+        <div class="panel-search"><input type="search" class="search" placeholder="Buscar en 4TA..." aria-label="Buscar en 4TA"><div class="ac-list" role="listbox"></div></div>
+        <ul class="list">
+  
+        <div class="no-results">No se encontraron participantes en esta categoría.</div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== VISTA: MARCAS ===== -->
+  <div id="view-brands" class="view">
+    <main class="container">
+      <section class="brands-grid" aria-label="Listado de marcas">
+        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/Copia-de-Green-and-White-Modern-Bold-Tennis-Course-Sport-Presentation-e1760120335238.png" alt="Marca 1" loading="lazy"></article>
+        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/03/cropped-cropped-WhatsApp-Image-2025-02-28-at-2.31.55-PM-1-1-300x230.jpeg" alt="Marca 2" loading="lazy"></article>
+        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/image.jpg" alt="Marca 3" loading="lazy"></article>
+        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/Copia-de-Green-and-White-Modern-Bold-Tennis-Course-Sport-Presentation-3-e1759974902519.jpg" alt="Marca 4" loading="lazy"></article>
+        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-07-at-5.51.44-PM-1-e1759974958255.jpeg " alt="Marca 5" loading="lazy"></article>
+        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-10-at-2.26.44-PM-e1760127863120.jpeg " alt="Marca 6" loading="lazy"></article>
+        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-10-at-2.26.44-PM-1-e1760127823791.jpeg" alt="Marca 7" loading="lazy"></article>
+    </main>
+  </div>
+  <script>
+  /* Fondo del HERO desde data-bg */
+  (function(){
+    const hero = document.getElementById('hero');
+    const bgUrl = hero?.getAttribute('data-bg');
+    if(bgUrl){ document.documentElement.style.setProperty('--hero-photo', `url('${bgUrl}')`); }
+  })();
+
+  /* Menú móvil */
+  const burger = document.getElementById('burger');
+  const menu = document.getElementById('mainmenu');
+  burger.addEventListener('click', () => {
+    const open = menu.classList.toggle('show');
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>{ menu.classList.remove('show'); burger.setAttribute('aria-expanded','false'); }));
+
+  /* Router por hash */
+  const viewHome   = document.getElementById('view-home');
+  const viewPart   = document.getElementById('view-part');
+  const viewBrands = document.getElementById('view-brands');
+  const panels = Array.from(document.querySelectorAll('.panel'));
+
+  function showView(target){
+    [viewHome, viewPart, viewBrands].forEach(v => v.classList.remove('active'));
+    target.classList.add('active');
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+  function route(){
+    const h = location.hash || '#inicio';
+    if (h === '#marcas'){ showView(viewBrands); return; }
+    if (h.startsWith('#participantes-')){
+      showView(viewPart);
+      panels.forEach(p => p.classList.toggle('active', ('#'+p.id)===h));
+      document.querySelector(h)?.scrollIntoView({behavior:'smooth',block:'start'});
+      return;
+    }
+    showView(viewHome);
+    if (h==='#quienes-somos' || h==='#categorizacion'){
+      document.querySelector(h)?.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  }
+  window.addEventListener('hashchange', route);
+  document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click', ()=>setTimeout(route,0)));
+  route();
+
+  /* Animaciones de entrada globales (reveal simple) */
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('shown'); io.unobserve(e.target); }
+    });
+  },{threshold:.14});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  /* Buscador con autocompletar por categoría */
+  const norm=t=>(t||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  const tokens=name=>norm(name).split(/\s+/).filter(Boolean);
+  function setupCategorySearch(panel){
+    const input=panel.querySelector('.search'); const list=panel.querySelector('.list'); const empty=panel.querySelector('.no-results'); const acBox=panel.querySelector('.ac-list');
+    if(!input||!list)return;
+    const getItems=()=>Array.from(list.querySelectorAll('li')).map(li=>({el:li,name:li.textContent.trim()}));
+    function renderAC(sugs){ if(!sugs.length){acBox.classList.remove('show');acBox.innerHTML='';return;} acBox.innerHTML=sugs.slice(0,10).map(s=>`<div class="ac-item" role="option" data-name="${s.name.replace(/"/g,'&quot;')}">${s.name}</div>`).join(''); acBox.classList.add('show'); }
+    function applyFilter(q,items){ let vis=0; const nq=norm(q); items.forEach(({el,name})=>{ const show=!nq||norm(name).includes(nq); el.style.display=show?'':'none'; if(show)vis++;}); if(empty) empty.style.display=(vis===0)?'block':'none'; }
+    function suggest(q,items){ const nq=norm(q); if(!nq) return []; return items.filter(({name})=> tokens(name).some(tok=>tok.startsWith(nq)) ); }
+    input.addEventListener('input',()=>{ const items=getItems(); const q=input.value; applyFilter(q,items); renderAC(suggest(q,items)); });
+    acBox.addEventListener('click',(e)=>{ const it=e.target.closest('.ac-item'); if(!it)return; const name=it.dataset.name; input.value=name; const items=getItems(); applyFilter(name,items); acBox.classList.remove('show'); items.find(x=>x.name===name)?.el?.scrollIntoView({behavior:'smooth',block:'center'}); });
+    document.addEventListener('click',(e)=>{ if(!panel.contains(e.target) && acBox.classList.contains('show')) acBox.classList.remove('show'); });
+  }
+  document.querySelectorAll('.panel').forEach(setupCategorySearch);
+</script>
+<script>
+</script>
+</body>
+</html>
