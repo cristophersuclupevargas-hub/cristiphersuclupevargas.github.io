@@ -1,1602 +1,2089 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AOTAP</title>
-
-<!-- Tipografías: Inter (UI), EB Garamond (héroe fino), Cinzel (header elegante) -->
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
-
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ebook de Odontología | Biblioteca Digital</title>
 <style>
-  :root{
-    --brand-bg:#000; --brand-text:#fff;
-    --body-bg:#fff;  --body-text:#111; --muted:#555;
-    --accent:#000;
-    --gold:#d4af37;
-    --card-border:#e7e7e7; --shadow-sm:0 4px 14px rgba(0,0,0,.08);
-    --shadow-md:0 18px 44px rgba(0,0,0,.16);
 
-    /* Imagen del héroe: cámbiala en data-bg del #hero */
-    --hero-photo:url('https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=2000&auto=format&fit=crop');
+/* ============================================================
+   ZONA DE PERSONALIZACIÓN RÁPIDA
+   Cambia estos valores para modificar colores y fondos
+   ============================================================ */
+:root {
+  /* Colores principales (del logo: teal + gris oscuro) */
+  --teal:    #3ABFB5;   /* Color turquesa principal */
+  --teal2:   #2aa89e;   /* Turquesa hover */
+  --teal3:   #1d8f86;   /* Turquesa oscuro (textos) */
+  --gris:    #3d3d3d;   /* Gris medio */
+  --gris2:   #2a2a2a;   /* Gris oscuro (fondo nav/footer) */
 
-    /* Brillo de Categorización (RGB) */
-    --cat-glow-rgb: 59,130,246; /* azul #3b82f6 */
-  }
+  /* Fondos de secciones — CAMBIA AQUÍ */
+  --fondo-hero:      #1a1a1a;   /* Fondo del INICIO si el video no carga */
+  --fondo-carrusel:  #222222;   /* Fondo de la banda del carrusel */
+  --fondo-nosotros:  #f5f9f9;   /* Fondo de la sección NOSOTROS */
+  --fondo-catalogo:  #ffffff;   /* Fondo de la sección CATÁLOGO */
+  --fondo-footer:    #2a2a2a;   /* Fondo del FOOTER */
 
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{
-    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-    color:var(--body-text);
-    background:var(--body-bg);
-    line-height:1.6;
-  }
-  img{max-width:100%;display:block}
-  .container{max-width:1110px;margin:0 auto;padding:0 16px}
-
-  /* ===== Header elegante ===== */
-  header{
-    position:sticky; top:0; z-index:1000;
-    background:var(--brand-bg); color:var(--brand-text);
-    box-shadow:0 1px 10px rgba(0,0,0,.15);
-  }
-  header::after{
-    content:""; display:block; height:2px;
-    background:linear-gradient(90deg, transparent, rgba(212,175,55,.6), transparent);
-  }
-  .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
-  .brand{display:flex;gap:10px;align-items:center;text-decoration:none;color:#fff;position:relative}
-  .brand img{width:36px;height:36px;object-fit:contain}
-  .brand .title{
-    font-family:"Cinzel",serif; font-weight:700; letter-spacing:.6px;
-    position:relative; padding-bottom:2px;
-  }
-  .brand .title::after{
-    content:""; position:absolute; left:0; right:0; bottom:-4px; height:2px;
-    background:linear-gradient(90deg, transparent, var(--gold), transparent);
-    transform:scaleX(.65); transform-origin:center; transition:transform .25s ease;
-    border-radius:999px;
-  }
-  .brand:hover .title::after{ transform:scaleX(1); }
-  .menu{display:flex;gap:16px;list-style:none;margin:0;padding:0}
-  .menu a{
-    color:#fff;text-decoration:none;padding:10px 12px;border-radius:10px;font-weight:600;position:relative;
-  }
-  .menu a::after{
-    content:""; position:absolute; left:12px; right:12px; bottom:6px; height:2px;
-    background:linear-gradient(90deg,transparent,#fff,transparent);
-    transform:scaleX(0); transform-origin:center; transition:transform .2s ease;
-    border-radius:999px;
-  }
-  .menu a:hover::after{ transform:scaleX(1); }
-  .burger{display:none;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.25);padding:8px 10px;border-radius:8px}
-  @media (max-width:768px){
-    .burger{display:block}
-    .menu{
-      display:none;position:absolute;left:0;right:0;top:66px;background:#000;
-      border-top:1px solid rgba(255,255,255,.12);padding:12px 16px;flex-direction:column;gap:10px
-    }
-    .menu.show{display:flex}
-  }
-
-  /* ===== Vistas ===== */
-  .view{display:none}
-  .view.active{display:block}
-
-  /* ===== HERO (tarjeta blanca abajo) ===== */
-  .hero-wrap{
-    position:below; min-height:105vh;
-    display:flex; align-items:flex-end; justify-content:center;
-    overflow:hidden; isolation:isolate;
-  }
-  .hero-bg{
-    position:absolute; inset:0;
-    background:#000 center/cover no-repeat; background-image:var(--hero-photo);
-    transform:scale(1.02);
-  }
-  .hero-bg::after{
-    content:""; position:absolute; inset:0;
-    background:linear-gradient(180deg,rgba(0,0,0,.06) 0%,rgba(0,0,0,.18) 40%,rgba(0,0,0,.46) 100%);
-  }
-  .hero-card{
-    position:relative; z-index:2;
-    width:min(700px,86vw); background:#fff;
-    border:1px solid rgba(0,0,0,.06); border-radius:10px;
-    box-shadow:0 28px 64px rgba(0,0,0,.18);
-    padding:10px 10px 40px;           /* más aire interno */
-    text-align:center;
-    margin-bottom:1.4vh;               /* un poco más abajo */
-    animation:fadeUp .9s ease both;
-  }
-  .kicker{
-    font-weight:800;letter-spacing:.14em;text-transform:uppercase;
-    color:#1a1a1a;font-size:14px;margin-bottom:20px
-  }
-  /* —— Héroe con EB Garamond, fino —— */
-  .hero-title{
-    margin:0 0 7px; line-height:1.06;
-    font-family:"EB Garamond",;
-    font-weight:800;
-    letter-spacing:.7px; color:#000;
-    font-size:clamp(26px,2.6vw,84px);
-  }
-  .hero-title small{
-    display:block; letter-spacing:.7px;
-    font-family:"EB Garamond",; font-weight:850;
-    font-size:clamp(22px,5.4vw,35px)
-  }
-  .cta{
-    margin-top:32px; display:inline-flex; align-items:center; justify-content:center;
-    padding:14px 22px; border-radius:10px; border:2px solid var(--accent);
-    color:var(--accent); background:#fff; text-decoration:none; font-weight:800;
-    transition:background .25s,color .25s,transform .12s
-  }
-  .cta:hover{background:var(--accent);color:#fff;transform:translateY(-2px)}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
-
-  /* ===== Secciones ===== */
-  section{scroll-margin-top:80px;padding:56px 0}
-  h2{font-size:clamp(22px,4.6vw,34px);margin:0 0 12px}
-  .section-lead{color:#444;margin:0 0 26px}
-  .center{max-width:1000px;margin:0 auto 28px;text-align:center}
-  .reveal{opacity:0;transform:translateY(18px)}
-  .reveal.shown{opacity:1;transform:none;transition:opacity .6s ease,transform .6s ease}
-
-  /* ===== Quiénes somos ===== */
-  #quienes-somos .qs-grid{display:grid;gap:26px;grid-template-columns:1fr}
-  @media (min-width:980px){#quienes-somos .qs-grid{grid-template-columns:repeat(3,1fr)}}
-  .qs-card{background:#fff;border:2px solid #ececec;border-radius:12px;padding:26px 22px;box-shadow:var(--shadow-sm)}
-  .qs-card h3{
-    margin:0 0 12px;font-size:clamp(18px,3vw,22px);
-    font-family:"Cinzel",serif;letter-spacing:.3px
-  }
-
-  /* ===== Categorización con BRILLO visible ===== */
-  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
-  @media (min-width:980px){.grid{grid-template-columns:repeat(4,1fr);gap:26px}}
-  .card{
-    position:relative;background:#fff;border:1px solid var(--card-border);
-    border-radius:14px;overflow:hidden;
-    box-shadow:
-      0 10px 22px rgba(0,0,0,.08),
-      0 0 28px rgba(var(--cat-glow-rgb), .48),
-      0 0 64px rgba(var(--cat-glow-rgb), .36);
-    transition:box-shadow .18s ease, transform .12s ease;
-  }
-  .card:hover{
-    transform:translateY(-2px);
-    box-shadow:
-      0 12px 26px rgba(0,0,0,.10),
-      0 0 36px rgba(var(--cat-glow-rgb), .58),
-      0 0 86px rgba(var(--cat-glow-rgb), .44);
-  }
-  .card .thumb{aspect-ratio:16/10;background:#fafafa;display:grid;place-items:center;border-bottom:1px solid var(--card-border)}
-  .card .thumb img{width:100%;height:100%;object-fit:contain;padding:12px}
-  .card .body{padding:22px;display:flex;flex-direction:column;gap:12px}
-  .tag{display:inline-flex;align-items:center;gap:8px;font-weight:800}
-  .tag .dot{width:10px;height:10px;border-radius:999px;background:#0a66ff}
-  .btn{appearance:none;border:0;cursor:pointer;background:#111;color:#fff;padding:12px 14px;border-radius:10px;font-weight:570;width:fit-content;text-decoration:none}
-  .btn:hover{background:#000}
-
-  /* ===== Participantes ===== */
-  .panel{display:none}
-  .panel.active{display:block}
-  .panel h2{text-align:center;margin-bottom:8px}
-  .panel-search{max-width:720px;margin:0 auto 22px;display:flex;justify-content:center;position:relative}
-  .panel-search input{width:100%;max-width:600px;padding:14px 16px;border-radius:12px;border:2px solid #d9d9d9;background:#fff;outline:none;text-align:center}
-  .ac-list{position:absolute;top:100%;left:50%;transform:translateX(-50%);width:min(600px,96vw);background:#fff;border:2px solid #ececec;border-radius:12px;margin-top:8px;box-shadow:var(--shadow-sm);display:none;max-height:240px;overflow:auto;z-index:50}
-  .ac-list.show{display:block}
-  .ac-item{padding:10px 12px;cursor:pointer;border-top:1px solid #f2f2f2}
-  .ac-item:first-child{border-top:0}
-  .ac-item:hover{background:#f7f7f7}
-  .no-results{color:#666;text-align:center;margin-top:10px;display:none}
-  .list{display:grid;grid-template-columns:1fr;gap:16px;max-width:720px;margin:0 auto;padding-left:0;justify-items:center}
-  @media (min-width:720px){.list{grid-template-columns:repeat(2,minmax(260px,1fr));max-width:none;justify-items:stretch}}
-  .list li{list-style:none;padding:16px 18px;border-radius:12px;background:#fff;border:2px solid #e7e7e7;text-align:center;width:100%}
-  .list li.ascenso{background:linear-gradient(180deg,#eafff6,#d8fff0);border-color:#a6f3d6;position:center}
-  .list li.ascenso::after{content:"PRONTA ASCENCIÓN";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#16a34a;color:#05351d;font-weight:800;font-size:12px;padding:2px 8px;border-radius:999px;box-shadow:var(--shadow-sm)}
-
-  /* ===== Marcas ===== */
-  .brands-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
-  @media (min-width:700px){.brands-grid{grid-template-columns:repeat(3,1fr)}}
-  @media (min-width:1000px){.brands-grid{grid-template-columns:repeat(4,1fr)}}
-  .brand-card{background:#fff;border:2px solid #ececec;border-radius:12px;padding:26px;display:grid;place-items:center;box-shadow:var(--shadow-sm);transition:transform .15s, box-shadow .2s}
-  .brand-card:hover{transform:translateY(-2px) scale(1.01); box-shadow:0 14px 26px rgba(0,0,0,.12)}
-  .brand-card img{width:100%;height:190px;object-fit:contain}
-  @media (min-width:900px){.brand-card img{height:200px}}
-
-  /* ====== HEADER: centrar título en móvil con logo a la izquierda ====== */
-  @media (max-width: 768px){
-    .nav{ position: relative; }
-    .brand .title{ visibility: hidden; } /* mantiene el espacio del logo, oculta texto */
-    .nav::before{
-      content: "AOTAP";
-      position: absolute; left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      font-family: "Cinzel", serif;
-      font-weight: 700; letter-spacing: .6px;
-      color: #fff; pointer-events: none; white-space: nowrap;
-    }
-  }
-
-  /* ====== QUIÉNES SOMOS: más sombra en tarjetas ====== */
-  .qs-card{
-    border: 2px solid #e6e6e6;
-    box-shadow:
-      0 10px 28px rgba(0,0,0,.10),
-      0 2px 28px rgba(0,0,0,.06);
-    background:#fff;
-  }
-  #quienes-somos .qs-grid{ gap: 28px; }
-  .qs-card{ padding: 28px 24px; }
-
-  /* Centrar Misión y Visión cuando solo hay 2 tarjetas */
-#quienes-somos .qs-grid{
-  /* ancho propio para centrar el conjunto */
-  max-width: 1120px;      /* ajusta si quieres más/menos ancho */
-  margin: 0 auto;         /* centra el grid como bloque */
-  justify-items: center;  /* centra cada tarjeta cuando quede una por fila */
+  /* Otros colores de UI */
+  --blanco:     #ffffff;
+  --fondo-card: #f5f9f9;
+  --gris-claro: #e8f0ef;
+  --texto:      #2a2a2a;
+  --muted:      #6b7a7a;
+  --sombra:     0 4px 24px rgba(58,191,181,.12);
+  --sombra2:    0 8px 40px rgba(58,191,181,.22);
 }
 
-@media (min-width: 980px){
-  #quienes-somos .qs-grid{
-    /* EXACTO: dos columnas y el conjunto centrado */
-    grid-template-columns: repeat(2, minmax(320px, 520px));
-    justify-content: center; /* centra las dos columnas en el ancho disponible */
-    gap: 32px;               /* espacio entre tarjetas */
-  }
-  #quienes-somos .qs-card{
-    width: 100%;             /* que cada tarjeta use su columna completa */
-  }
-}
-/* ====== LOGO y TÍTULO un poco más grandes ====== */
-header .brand img{
-  width: 48px;   /* antes 36px — súbelo si quieres más */
-  height: 48px;
-  object-fit: contain;
+/* ============================================================
+   RESET Y BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--texto);
+  background: var(--blanco);
+  overflow-x: hidden;
+  line-height: 1.6;
 }
 
-header .brand .title{
-  font-size: clamp(20px, 2.1vw, 28px); /* sube 28→30 si lo quieres más grande */
-  letter-spacing: .7px;
-  white-space: nowrap; /* evita salto de línea */
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 5%; height: 66px;
+  background: rgba(30,30,30,.97);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(58,191,181,.2);
 }
 
-/* Algo más de alto a la barra para que respire */
-header .nav{ padding: 18px 0; }
-
-/* ====== MÓVIL: logo a la izquierda y título centrado ====== */
-@media (max-width: 800px){
-  header .nav{ position: relative; }
-  header .brand .title{ visibility: hidden; } /* oculta texto interno, mantiene logo */
-
-  /* Texto centrado en móvil (cámbialo si quieres otro nombre) */
-  header .nav::before{
-    content: "AOTAP";
-    position: absolute; left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
-    font-family: "Cinzel", serif;
-    font-weight: 800; letter-spacing: .7px;
-    color: #fff; white-space: nowrap; pointer-events: none;
-    font-size: clamp(16px, 5.4vw, 22px); /* ajusta tamaño en móvil */
-  }
-
-  /* logo apenas más chico en móviles muy pequeños (opcional) */
-  header .brand img{ width: 50px; height: 50px; }
+/* Logo tipo texto con estilo del logo original */
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; user-select: none;
 }
-/* Más espacio debajo del header en la vista de Marcas */
-#view-brands .container{
-  padding-top: 10px;   /* súbelo/bájalo a tu gusto: 24–64px */
+.nav-logo-icon {
+  /* Ícono del libro igual al del logo */
+  position: relative; width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
 }
-#view-brands h2.center{
-  margin-top: 8px;     /* evita que el h2 quede pegado */
+.nav-logo-icon svg { width: 34px; height: 34px; }
+.nav-logo-text {
+  display: flex; flex-direction: column; line-height: 1;
 }
-/* ===== Centrar botones "Ver participantes" en MÓVIL ===== */
-@media (max-width: 768px){
-  /* Centra el contenido de la tarjeta */
-  .card .body{
-    align-items: center;           /* centra todo lo que hay dentro */
-  }
-
-  /* Botón centrado y con ancho controlado */
-  .card .body .btn{
-    display: block;                /* permite usar margin auto */
-    margin: 10px auto 0;           /* centra horizontalmente */
-    width: min(280px, 90%);        /* no se pega a los bordes */
-    text-align: center;            /* texto centrado */
-    white-space: normal;           /* permite salto de línea */
-    border-radius: 12px;           /* por si se cortaba la esquina */
-  }
+.nav-logo-ebook {
+  font-size: 17px; font-weight: 900; color: #fff;
+  letter-spacing: -.3px;
 }
-/* ===== Quiénes somos con el mismo estilo de tarjeta (Misión / Visión) ===== */
-#quienes-somos .center{
-  /* aspecto de tarjeta */
-  background: #fff;
-  border: 1px solid #e6e6e6;
-  border-radius: 12px;
-  box-shadow:
-    0 10px 28px rgba(0,0,0,.10),
-    0 2px 8px rgba(0,0,0,.06);
-  padding: 28px 24px;
-
-  /* alineación como las tarjetas (no centrado) */
-  text-align: left;
-
-  /* mismo ancho y separación que las otras */
-  max-width: 1120px;
-  margin: 0 auto 28px;
+.nav-logo-sub {
+  font-size: 9px; font-weight: 700; color: var(--teal);
+  letter-spacing: 2px; text-transform: uppercase; margin-top: 2px;
 }
 
-/* Título con la misma tipografía elegante de las tarjetas */
-#quienes-somos .center h2{
-  font-family: "Cinzel", serif;  /* misma fuente que usas en Misión/Visión */
-  font-weight: 700;
-  letter-spacing: .3px;
-  font-size: clamp(22px, 3.6vw, 28px);
-  margin: 0 0 10px;
+/* Links de navegación desktop */
+.nav-links { display: flex; gap: 4px; list-style: none; }
+.nav-links a {
+  color: rgba(255,255,255,.78); text-decoration: none;
+  font-size: 13.5px; font-weight: 500;
+  padding: 8px 15px; border-radius: 8px; transition: .2s;
+}
+.nav-links a:hover { background: rgba(58,191,181,.14); color: var(--teal); }
+.nav-links a.act { background: var(--teal); color: #fff; }
+
+/* Botón MegaPack en nav */
+.nav-mp-btn {
+  display: flex; align-items: center; gap: 7px;
+  background: linear-gradient(135deg, var(--teal), var(--teal2));
+  color: #fff; font-weight: 700; font-size: 13px;
+  padding: 9px 18px; border-radius: 9px;
+  border: none; cursor: pointer; text-decoration: none;
+  transition: .2s; box-shadow: 0 3px 14px rgba(58,191,181,.35);
+  white-space: nowrap;
+}
+.nav-mp-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(58,191,181,.45); }
+.nav-mp-dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; animation: pulso 2s infinite; }
+@keyframes pulso { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+/* Botón hamburguesa */
+.hamburger {
+  display: none; flex-direction: column;
+  justify-content: center; align-items: center;
+  gap: 5px; cursor: pointer; background: none;
+  border: 1px solid rgba(255,255,255,.15); border-radius: 9px;
+  padding: 8px; width: 40px; height: 40px; transition: .2s;
+}
+.hamburger:hover { background: rgba(255,255,255,.08); border-color: var(--teal); }
+.hamburger span {
+  display: block; width: 18px; height: 2px;
+  background: #fff; border-radius: 2px; transition: .3s; transform-origin: center;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ============================================================
+   MENÚ MÓVIL — Panel premium deslizable desde arriba
+   ============================================================ */
+.mobile-menu-overlay {
+  display: none; position: fixed; inset: 0; z-index: 998;
+  background: rgba(10,10,10,.6); backdrop-filter: blur(4px);
+}
+.mobile-menu-overlay.vis { display: block; }
+
+.mobile-menu {
+  position: fixed; top: 66px; left: 0; right: 0; z-index: 999;
+  background: #1a1a1a;
+  border-bottom: 2px solid var(--teal);
+  transform: translateY(-110%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  padding: 0 5% 24px;
+}
+.mobile-menu.vis { transform: translateY(0); }
+
+/* Sección de usuario en el menú */
+.mm-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 20px 0 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  margin-bottom: 12px;
+}
+.mm-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--teal3));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.mm-brand-name { font-size: 14px; font-weight: 700; color: #fff; }
+.mm-brand-sub { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 1px; }
+
+/* Links del menú */
+.mm-links { display: flex; flex-direction: column; gap: 3px; margin-bottom: 16px; }
+.mm-link {
+  display: flex; align-items: center; gap: 12px;
+  color: rgba(255,255,255,.8); text-decoration: none;
+  font-size: 15px; font-weight: 500;
+  padding: 12px 14px; border-radius: 11px; transition: .2s;
+}
+.mm-link:hover { background: rgba(58,191,181,.12); color: var(--teal); }
+.mm-link.act { background: rgba(58,191,181,.18); color: var(--teal); font-weight: 600; }
+.mm-link-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: rgba(255,255,255,.07);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0; transition: .2s;
+}
+.mm-link:hover .mm-link-icon { background: rgba(58,191,181,.2); }
+.mm-link.act .mm-link-icon { background: rgba(58,191,181,.25); }
+
+.mm-sep { height: 1px; background: rgba(255,255,255,.07); margin: 8px 0; }
+
+/* Botón MegaPack en menú móvil */
+.mm-megapack {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, rgba(58,191,181,.18), rgba(58,191,181,.08));
+  border: 1px solid rgba(58,191,181,.3);
+  color: var(--teal); text-decoration: none;
+  font-size: 15px; font-weight: 700;
+  padding: 14px 16px; border-radius: 12px; transition: .2s;
+}
+.mm-megapack:hover { background: rgba(58,191,181,.25); }
+.mm-megapack-left { display: flex; align-items: center; gap: 12px; }
+.mm-megapack-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: rgba(58,191,181,.2);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.mm-megapack-arrow { font-size: 18px; opacity: .7; }
+
+/* ============================================================
+   HERO PREMIUM — Canvas + Aurora + Libros 3D (mobile-first)
+   ============================================================ */
+#inicio {
+  min-height: 100vh; position: relative;
+  display: flex; align-items: center;
+  padding: 90px 5% 70px; overflow: hidden;
+  background: #030a09;
 }
 
-/* Texto introductorio: un poco más oscuro y sin demasiado espacio abajo */
-#quienes-somos .center .section-lead{
-  color: #222;
-  margin: 0;
-}
-/* MÓVIL: reduce el texto del botón "Ver participantes" */
-@media (max-width: 768px){
-  .card .body .btn{
-    font-size: 10px;      /* prueba 14–15px */
-    line-height: 1.2;     /* compacta el alto de línea */
-    padding: 12px 14px;   /* un poco menos de padding */
-  }
-}
-/* ===== Participantes: 2 cols en móvil, 3 cols en PC ===== */
-/* Base = móvil */
-.list{
-  display: grid;
-  grid-template-columns: repeat(2, minmax(140px, 1fr));
-  gap: 12px;
-  max-width: none;          /* quita el tope que tenías */
-  justify-items: stretch;   /* que cada casilla use su columna */
+/* Canvas de partículas */
+#heroCanvas {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; display: block;
 }
 
-/* Casillas un poco más compactas en móvil */
-.list li{
-  padding: 12px 10px;
-  font-size: 14px;
+/* Aurora boreal */
+.hero-aurora {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 55% at 60% -10%,
+      rgba(58,191,181,.28) 0%, rgba(29,143,134,.10) 40%, transparent 65%),
+    radial-gradient(ellipse 80% 40% at 100% 30%,
+      rgba(0,200,160,.14) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 60%,
+      rgba(20,120,110,.12) 0%, transparent 60%);
+  animation: auroraPulse 9s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+}
+@keyframes auroraPulse {
+  0%   { opacity:.7; transform:scaleX(1)    scaleY(1); }
+  50%  { opacity:1;  transform:scaleX(1.04) scaleY(.97); }
+  100% { opacity:.9; transform:scaleX(.98)  scaleY(1.02); }
+}
+.hero-aurora2 {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 40% at 20% 110%,
+      rgba(58,191,181,.15) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 35% at 85% 90%,
+      rgba(0,180,140,.10) 0%, transparent 50%);
+  animation: auroraPulse2 13s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+}
+@keyframes auroraPulse2 {
+  0%   { opacity:.5; transform:translateY(0); }
+  100% { opacity:.9; transform:translateY(-20px); }
 }
 
-/* Tablets: mantenemos 2 columnas cómodas */
-@media (min-width: 720px){
-  .list{
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
-    gap: 14px;
-  }
-  .list li{
-    padding: 14px 12px;
-    font-size: 15px;
+/* Grid de puntos */
+.hero-grid {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(58,191,181,.22) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, rgba(0,0,0,.5) 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, rgba(0,0,0,.5) 0%, transparent 75%);
+  animation: gridSlide 20s linear infinite;
+}
+@keyframes gridSlide { 0%{background-position:0 0} 100%{background-position:40px 40px} }
+
+/* Rayo de luz diagonal */
+.hero-beam {
+  position: absolute; z-index: 2; pointer-events: none;
+  top: -20%; left: -10%; width: 2px; height: 140%;
+  background: linear-gradient(180deg,
+    transparent 0%, rgba(58,191,181,.5) 30%,
+    rgba(58,191,181,1) 50%, rgba(58,191,181,.5) 70%, transparent 100%);
+  transform: rotate(25deg);
+  filter: blur(1px);
+  box-shadow: 0 0 16px 3px rgba(58,191,181,.4);
+  animation: beamSlide 8s ease-in-out infinite;
+}
+@keyframes beamSlide {
+  0%   { left:-10%; opacity:0; }
+  8%   { opacity:1; }
+  88%  { opacity:.8; }
+  100% { left:110%; opacity:0; }
+}
+
+/* ── LAYOUT INTERNO — columna en móvil, fila en desktop ── */
+.hero-inner {
+  position: relative; z-index: 4;
+  width: 100%; display: flex;
+  flex-direction: column;            /* móvil: libros arriba, texto abajo */
+  align-items: center; gap: 40px;
+}
+@media(min-width: 860px) {
+  .hero-inner {
+    flex-direction: row;             /* desktop: texto izq, libros der */
+    align-items: center;
+    justify-content: space-between;
   }
 }
 
-/* PC/Laptops grandes: 3 columnas */
-@media (min-width: 980px){
-  .list{
-    grid-template-columns: repeat(3, minmax(220px, 1fr));
-    gap: 16px;
-  }
-  .list li{
-    padding: 16px 14px;
-    font-size: 15px;
-  }
+/* ── PANEL DE LIBROS 3D ── */
+.hero-right {
+  position: relative; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  width: 100%;                       /* móvil: ancho completo */
+  max-width: 300px;                  /* móvil: centrado y compacto */
 }
-
-/* (Opcional) un poquito más de aire si se pega al header al abrir por hash */
-
-#view-part .container{ padding-top: 24px; }
-/* ===== Reducir tamaño de la pill de ascenso en móviles ===== */
-@media (max-width: 768px){
-  .list li.ascenso::after{
-    /* tamaño más pequeño y en 1 sola línea */
-    font-size: 11.5px;
-    line-height: 1;
-    padding: 4px 10px;
-    white-space: nowrap;      /* evita que se corte en dos líneas */
-    top: -10px;               /* ajusta la altura del “globo” */
-    border-radius: 999px;
-  }
-
-  /* si quieres que la tarjeta también sea un poco más compacta */
-  .list li{
-    padding: 12px 10px;
-    font-size: 14px;
+@media(min-width: 860px) {
+  .hero-right {
+    width: 45%;
+    max-width: none;
   }
 }
 
-/* Móviles muy estrechos (≤ 420px): aún más chiquito */
-@media (max-width: 420px){
-  .list li.ascenso::after{
-    font-size: 10.5px;
-    padding: 3px 8px;
-    top: -9px;
-  }
+.hero-books {
+  position: relative;
+  width: 260px; height: 340px;      /* tamaño móvil */
+  transform-style: preserve-3d;
+  animation: booksRotate 12s ease-in-out infinite alternate;
+  margin: 0 auto;
 }
-/* Icono a la izquierda de cada participante (PC y móvil) */
-.list li{
-  position: relative;              /* para que el badge "Ascenso" siga bien posicionado */
-  display: flex;                   /* alinea icono + texto */
-  align-items: center;
-  gap: 12px;                       /* espacio entre icono y texto */
+@media(min-width: 860px) {
+  .hero-books { width: 320px; height: 420px; }
 }
-
-/* Dibujamos el icono con ::before */
-.list li::before{
-  content: "";
-  flex: 0 0 26px;                  /* tamaño del icono en PC */
-  width: 26px;
-  height: 26px;
-  background: url("https://i.pinimg.com/736x/43/14/0a/43140a3803e5f1b39c1ffac1a35a3ec7.jpg") no-repeat center / contain;
-  filter: grayscale(100%);         /* opcional: neutro */
-  opacity: .9;                     /* opcional: un pelín más suave */
+@keyframes booksRotate {
+  0%   { transform: rotateY(-12deg) rotateX(4deg)  translateY(0); }
+  100% { transform: rotateY(8deg)   rotateX(-3deg) translateY(-18px); }
 }
 
-/* Móvil: icono un poco más chico y menor separación */
-@media (max-width: 768px){
-  .list li{ gap: 10px; }
-  .list li::before{
-    flex-basis: 20px;
-    width: 20px; height: 20px;
-  }
+/* Tarjetas de libro */
+.hb {
+  position: absolute; border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.8), 0 0 0 1px rgba(58,191,181,.15);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  animation: bookFloat linear infinite alternate;
+}
+@keyframes bookFloat {
+  0%   { transform: translateY(0)    translateZ(0); }
+  100% { transform: translateY(-12px) translateZ(10px); }
 }
 
-/* Si alguna lista no debe mostrar icono, añade la clase .no-icon a su <ul> */
-.list.no-icon li::before{ display: none; }
-/* Nota pequeña centrada bajo el título de cada panel de participantes */
-.panel h2::after{
-  content: "LISTA ACTUALIZADA — HASTA OCTUBRE 2025";
-  display: block;
-  margin-top: 6px;
+/* Libro principal */
+.hb-main {
+  width: 145px; height: 200px; top: 65px; left: 58px;
+  background: linear-gradient(145deg, #0f3330 0%, #071e1c 50%, #0a2a27 100%);
+  border: 1px solid rgba(58,191,181,.35);
+  animation-duration: 5s;
+  box-shadow: 0 40px 100px rgba(0,0,0,.9),
+              0 0 0 1px rgba(58,191,181,.3),
+              0 0 40px rgba(58,191,181,.12),
+              inset 5px 0 0 rgba(58,191,181,.5);
+  z-index: 4;
+}
+@media(min-width: 860px) {
+  .hb-main { width: 180px; height: 250px; top: 80px; left: 70px; }
+}
+/* Libro izquierda */
+.hb-left {
+  width: 120px; height: 170px; top: 95px; left: -5px;
+  background: linear-gradient(145deg, #091d1b 0%, #050f0e 100%);
+  border: 1px solid rgba(58,191,181,.15);
+  transform: rotate(-8deg);
+  animation-duration: 6.5s; animation-delay: -.5s;
+  z-index: 3; opacity: .8;
+}
+@media(min-width: 860px) {
+  .hb-left { width: 150px; height: 210px; top: 120px; left: -10px; }
+}
+/* Libro derecha */
+.hb-right {
+  width: 115px; height: 160px; top: 105px; left: 158px;
+  background: linear-gradient(145deg, #0b2220 0%, #060f0e 100%);
+  border: 1px solid rgba(58,191,181,.12);
+  transform: rotate(9deg);
+  animation-duration: 7s; animation-delay: -2s;
+  z-index: 3; opacity: .7;
+}
+@media(min-width: 860px) {
+  .hb-right { width: 145px; height: 200px; top: 130px; left: 195px; }
+}
+/* Libro pequeño arriba */
+.hb-top {
+  width: 90px; height: 120px; top: -5px; left: 85px;
+  background: linear-gradient(145deg, #0d2a27 0%, #071817 100%);
+  border: 1px solid rgba(58,191,181,.1);
+  transform: rotate(4deg);
+  animation-duration: 8s; animation-delay: -4s;
+  z-index: 2; opacity: .6;
+}
+@media(min-width: 860px) {
+  .hb-top { width: 110px; height: 150px; top: -10px; left: 105px; }
+}
+
+/* Interior del libro principal */
+.hb-main-inner {
+  width: 100%; height: 100%; padding: 16px 13px;
+  display: flex; flex-direction: column; gap: 8px; position: relative;
+}
+.hb-spine {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+  background: linear-gradient(180deg, var(--teal), var(--teal3), var(--teal));
+  box-shadow: 0 0 12px rgba(58,191,181,.6);
+}
+.hb-tag {
+  font-size: 7px; font-weight: 800; letter-spacing: 2px;
+  color: var(--teal); text-transform: uppercase; opacity: .9;
+}
+.hb-title {
+  font-size: 11px; font-weight: 800; color: #fff;
+  line-height: 1.35; flex: 1;
+}
+.hb-lines { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; }
+.hb-line  { height: 2px; border-radius: 2px; opacity: .25;
+            background: linear-gradient(90deg, rgba(58,191,181,.8), transparent); }
+.hb-line:nth-child(2) { width: 70%; }
+.hb-line:nth-child(3) { width: 50%; }
+.hb-icon  { font-size: 26px; margin-top: auto; align-self: flex-end;
+            filter: drop-shadow(0 4px 12px rgba(58,191,181,.5)); }
+
+/* Glow detrás de los libros */
+.hb-glow {
+  position: absolute; inset: -20px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(58,191,181,.15) 0%, transparent 65%);
+  animation: glowPulse 3s ease-in-out infinite alternate; z-index: 1;
+}
+@keyframes glowPulse { 0%{opacity:.5;transform:scale(.95)} 100%{opacity:1;transform:scale(1.05)} }
+
+/* Badges flotantes */
+.hb-badge {
+  position: absolute; z-index: 10;
+  background: rgba(10,10,10,.88); border: 1px solid rgba(58,191,181,.35);
+  backdrop-filter: blur(10px); border-radius: 9px;
+  padding: 6px 10px; color: #fff; font-size: 10px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  white-space: nowrap;
+}
+.hb-badge-1 { top: 8px;    right: -15px; animation: bf1 4s ease-in-out infinite alternate; }
+.hb-badge-2 { bottom: 55px; right: -22px; animation: bf2 5s ease-in-out infinite alternate; }
+.hb-badge-3 { bottom: 5px;  left: -12px;  animation: bf3 6s ease-in-out infinite alternate; }
+@keyframes bf1 { 0%{transform:translateY(0) rotate(-1deg)} 100%{transform:translateY(-8px) rotate(1deg)} }
+@keyframes bf2 { 0%{transform:translateY(0) rotate(1deg)}  100%{transform:translateY(-6px) rotate(-1deg)} }
+@keyframes bf3 { 0%{transform:translateY(0)}               100%{transform:translateY(-10px)} }
+.hb-badge-dot {
+  display: inline-block; width: 6px; height: 6px;
+  border-radius: 50%; margin-right: 5px; vertical-align: middle;
+}
+
+/* ── CONTENIDO DE TEXTO ── */
+.hero-contenido {
+  position: relative; z-index: 4;
+  width: 100%; max-width: 600px;
+  text-align: center;                /* móvil: centrado */
+}
+@media(min-width: 860px) {
+  .hero-contenido { text-align: left; max-width: 600px; }
+}
+
+/* Entradas animadas */
+.hero-badge  { animation: fadeUp .7s .1s  both; }
+.hero-titulo { animation: fadeUp .7s .25s both; }
+.hero-desc   { animation: fadeUp .7s .4s  both; }
+.hero-btns   { animation: fadeUp .7s .55s both; }
+.hero-stats  { animation: fadeUp .7s .7s  both; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(28px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* En móvil: stats y botones centrados */
+@media(max-width: 859px) {
+  .hero-btns  { justify-content: center; }
+  .hero-stats { max-width: 100%; }
+}
+
+.hero-overlay   { display: none; }
+.hero-video-wrap { display: none; }
+@media(max-width: 640px) { .hero-beam { display: none; } }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(58,191,181,.16); border: 1px solid rgba(58,191,181,.3);
+  border-radius: 50px; padding: 6px 16px; margin-bottom: 22px;
+  font-size: 12.5px; color: rgba(255,255,255,.9); font-weight: 500;
+}
+.hero-dot { width: 7px; height: 7px; background: var(--teal); border-radius: 50%; animation: pulso 2s infinite; }
+.hero-titulo {
+  font-size: clamp(32px, 5.5vw, 58px); font-weight: 900; color: #fff;
+  line-height: 1.06; margin-bottom: 18px; letter-spacing: -1.5px;
+}
+.hero-titulo span { color: var(--teal); }
+.hero-desc {
+  font-size: 16px; color: rgba(255,255,255,.7);
+  margin-bottom: 34px; line-height: 1.75; max-width: 520px;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 50px; }
+.btn-catalogo {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--teal); color: #fff; font-weight: 700; font-size: 15px;
+  padding: 14px 28px; border-radius: 11px; text-decoration: none;
+  border: none; cursor: pointer; transition: .2s;
+  box-shadow: 0 4px 20px rgba(58,191,181,.45);
+}
+.btn-catalogo:hover { background: var(--teal2); transform: translateY(-2px); }
+.btn-mp-hero {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: transparent; border: 2px solid rgba(255,255,255,.28);
+  color: rgba(255,255,255,.88); font-weight: 600; font-size: 15px;
+  padding: 14px 28px; border-radius: 11px; text-decoration: none; cursor: pointer; transition: .2s;
+}
+.btn-mp-hero:hover { border-color: var(--teal); color: var(--teal); background: rgba(58,191,181,.08); }
+.hero-stats {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px; overflow: hidden; max-width: 460px;
+}
+.stat-item { text-align: center; padding: 18px 10px; border-right: 1px solid rgba(255,255,255,.1); }
+.stat-item:last-child { border-right: none; }
+.stat-num { font-size: 24px; font-weight: 800; color: var(--teal); display: block; }
+.stat-label { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 3px; line-height: 1.35; }
+
+/* ============================================================
+   CARRUSEL
+   ============================================================ */
+#carrusel {
+  padding: 52px 0; overflow: hidden;
+  background: linear-gradient(135deg, #0f2a4a 0%, #0d3d36 35%, #1a1060 70%, #0a2a3a 100%);
+  border-top: 2px solid rgba(58,191,181,.5);
+  border-bottom: 2px solid rgba(58,191,181,.5);
+  position: relative;
+}
+/* Puntos de luz decorativos */
+#carrusel::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 400px 200px at 15% 50%, rgba(58,191,181,.13) 0%, transparent 70%),
+    radial-gradient(ellipse 300px 180px at 80% 40%, rgba(100,80,220,.12) 0%, transparent 70%),
+    radial-gradient(ellipse 200px 150px at 50% 80%, rgba(58,191,181,.08) 0%, transparent 70%);
+}
+.carrusel-header { text-align: center; margin-bottom: 30px; padding: 0 5%; position: relative; z-index: 1; }
+.carrusel-header p { font-size: 11px; color: rgba(58,191,181,.75); letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+.carrusel-header h3 { font-size: 21px; font-weight: 800; color: #fff; }
+.carrusel-header h3 span { color: var(--teal); }
+.carrusel-track-wrap {
+  position: relative; z-index: 1;
+  overflow: hidden;
+  cursor: grab;
+  -webkit-user-select: none; user-select: none;
+  touch-action: pan-y;
+}
+.carrusel-track-wrap.grabbing { cursor: grabbing; }
+.carrusel-track {
+  display: flex; gap: 18px;
+  width: max-content; padding: 6px 20px;
+  will-change: transform;
+}
+.car-card {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(58,191,181,.25);
+  border-radius: 14px; overflow: hidden; flex-shrink: 0; width: 155px;
+  transition: border-color .25s, background .25s, box-shadow .25s;
+  backdrop-filter: blur(6px);
+}
+.car-card:hover { border-color: var(--teal); background: rgba(58,191,181,.14); box-shadow: 0 8px 28px rgba(58,191,181,.2); }
+.car-portada {
+  height: 195px; overflow: hidden;
+  background: linear-gradient(145deg, #1e2d40 0%, #162032 50%, #0e1a2e 100%);
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.car-portada img { width: 100%; height: 100%; object-fit: cover; }
+.car-portada-ph { font-size: 40px; opacity: .35; color: var(--teal); }
+.car-info { padding: 9px 10px; }
+.car-nombre { font-size: 10.5px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 4px; }
+.car-meta { font-size: 9.5px; color: rgba(180,220,215,.5); }
+.carrusel-fade-l,.carrusel-fade-r {
+  position: absolute; top: 0; bottom: 0; width: 90px; z-index: 2; pointer-events: none;
+}
+.carrusel-fade-l { left: 0; background: linear-gradient(to right, #0f2a4a, transparent); }
+.carrusel-fade-r { right: 0; background: linear-gradient(to left, #0a2a3a, transparent); }
+
+/* Hint de swipe — solo visible en pantallas táctiles */
+.swipe-hint {
+  display: none;
   text-align: center;
-  font-size: 9px;          /* tamaño pequeño */
-  letter-spacing: .08em;    /* un poco de tracking */
-  color: #6b7280;           /* gris suave */
-  text-transform: uppercase;
-  font-weight: 600;
+  margin-top: 12px;
+  position: relative; z-index: 1;
 }
-/* ===== Cintilla fija en PARTICIPANTES (título + "lista actualizada") ===== */
-
-/* Ajusta este valor si tu header es más alto o más bajo */
-:root{
-  --panel-stick-top: 110px;   /* espacio desde arriba para no chocar con el header */
+@media (pointer: coarse) { .swipe-hint { display: block; } }
+.swipe-hint-inner {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(58,191,181,.2);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 11.5px; color: rgba(255,255,255,.5); font-weight: 500;
+  animation: hintFadeOut 4s ease 1s forwards;
+  opacity: 1;
 }
-
-#view-part .panel h2{
-  position: sticky;
-  top: var(--panel-stick-top);
-  z-index: 500;                     /* por encima de la lista */
-  background: #fff;                 /* para tapar lo que pasa por debajo */
-  margin: 0 0 14px;                 /* un poco de respiro con el buscador */
-  padding: 14px 0 18px;             /* incluye la línea de “LISTA ACTUALIZADA” */
-  text-align: center;
-  box-shadow: 0 6px 12px rgba(0,0,0,.06); /* sutil sombra inferior */
-  border-radius: 10px;              /* opcional, para que parezca una banda */
+@keyframes hintFadeOut { 0%{opacity:1} 80%{opacity:1} 100%{opacity:0; visibility:hidden} }
+.swipe-hint-arrow {
+  display: inline-block;
+  animation: swipeMove 1.4s ease-in-out infinite;
+}
+@keyframes swipeMove {
+  0%,100% { transform: translateX(0); }
+  40%      { transform: translateX(-6px); }
+  60%      { transform: translateX(6px); }
 }
 
-/* La línea "LISTA ACTUALIZADA — OCTUBRE 2025" ya sale del ::after del h2.
-   Solo la afinamos un poquito cuando está sticky */
-#view-part .panel h2::after{
-  display: block;
-  margin-top: 6px;
+/* ============================================================
+   NOSOTROS
+   ============================================================
+   PARA CAMBIAR EL FONDO:
+   Edita --fondo-nosotros en :root arriba.
+   ============================================================ */
+#nosotros { background: var(--fondo-nosotros); padding: 90px 5%; }
+.nos-wrap { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.nos-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.nos-stat-card {
+  background: #fff; border-radius: 18px; padding: 28px 20px;
+  box-shadow: var(--sombra); text-align: center;
+  border: 1px solid rgba(58,191,181,.12); transition: .25s; position: relative; overflow: hidden;
+}
+.nos-stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--teal), var(--teal2));
+}
+.nos-stat-card:hover { transform: translateY(-5px); box-shadow: var(--sombra2); }
+.nos-stat-icon { font-size: 30px; margin-bottom: 10px; display: block; }
+.nos-stat-num { font-size: 34px; font-weight: 900; color: var(--gris2); display: block; margin-bottom: 6px; }
+.nos-stat-label { font-size: 13px; color: var(--muted); line-height: 1.45; }
+.nos-tag {
+  display: inline-block; background: rgba(58,191,181,.12); color: var(--teal3);
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 50px; margin-bottom: 14px;
+  border: 1px solid rgba(58,191,181,.2);
+}
+.nos-titulo { font-size: clamp(22px,3vw,34px); font-weight: 900; color: var(--gris2); margin-bottom: 14px; line-height: 1.2; }
+.nos-titulo span { color: var(--teal); }
+.nos-p { font-size: 15px; color: var(--muted); margin-bottom: 12px; line-height: 1.75; }
+.nos-lista { list-style: none; margin-bottom: 28px; }
+.nos-lista li { padding: 8px 0; display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--texto); border-bottom: 1px solid var(--gris-claro); }
+.nos-lista li:last-child { border-bottom: none; }
+.nos-check {
+  width: 20px; height: 20px; min-width: 20px;
+  background: rgba(58,191,181,.15); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--teal3); font-size: 11px; font-weight: 700; margin-top: 1px;
 }
 
-/* En móviles dejamos un poco menos de offset */
-@media (max-width: 768px){
-  :root{ --panel-stick-top: 66px; }
+/* ============================================================
+   BIBLIOTECA / CATÁLOGO
+   ============================================================
+   PARA CAMBIAR EL FONDO:
+   Edita --fondo-catalogo en :root arriba.
+   ============================================================ */
+#libros { background: var(--fondo-catalogo); padding: 90px 5%; }
+.lib-wrap { max-width: 1240px; margin: 0 auto; }
+.sec-header { text-align: center; max-width: 580px; margin: 0 auto 48px; }
+.sec-tag {
+  display: inline-block; background: rgba(58,191,181,.12); color: var(--teal3);
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 50px; margin-bottom: 12px; border: 1px solid rgba(58,191,181,.2);
 }
-/* MÓVIL: más espacio entre el header principal y la cintilla de la categoría */
-@media (max-width: 768px){
-  :root{
-    /* sube/baja este valor si hace falta */
-    --panel-stick-top: calc(92px + env(safe-area-inset-top)); 
-  }
+.sec-titulo { font-size: clamp(24px,3.5vw,38px); font-weight: 900; color: var(--gris2); margin-bottom: 10px; }
+.sec-titulo span { color: var(--teal); }
+.sec-desc { font-size: 15px; color: var(--muted); line-height: 1.7; }
 
-  /* un pelín más de aire dentro de la banda */
-  #view-part .panel h2{
-    padding: 16px 0 18px;
-  }
-}
+/* Layout: sidebar fijo + grid de libros */
+.lib-layout { display: grid; grid-template-columns: 215px 1fr; gap: 28px; align-items: start; }
 
-/* (muy chico) teléfonos ≤ 420px: un poco más por seguridad */
-@media (max-width: 420px){
-  :root{
-    --panel-stick-top: calc(100px + env(safe-area-inset-top));
-  }
+/* Sidebar desktop */
+.lib-sidebar {
+  background: var(--fondo-card); border-radius: 16px;
+  border: 1px solid rgba(58,191,181,.15);
+  padding: 18px 12px; position: sticky; top: 80px; overflow: hidden;
 }
-/* Participantes en MAYÚSCULAS (solo visual) */
-.list li{
-  text-transform: uppercase;
-  letter-spacing: .2px;
+.sidebar-titulo {
+  font-size: 9.5px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--muted); padding: 0 8px; margin-bottom: 8px;
 }
+.sidebar-sep { height: 1px; background: var(--gris-claro); margin: 8px 0; }
+.cat-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; background: none; border: none; cursor: pointer;
+  padding: 8px 10px; border-radius: 9px;
+  font-size: 13px; color: var(--texto); font-weight: 500; transition: .15s; text-align: left;
+}
+.cat-btn:hover { background: rgba(58,191,181,.1); color: var(--teal3); }
+.cat-btn.act { background: var(--teal); color: #fff; font-weight: 600; }
+.cat-btn.act .cat-count { background: rgba(255,255,255,.25); color: #fff; }
+.cat-count {
+  font-size: 11px; font-weight: 600; background: var(--gris-claro);
+  color: var(--muted); padding: 2px 8px; border-radius: 50px;
+}
+.anio-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; background: none; border: none; cursor: pointer;
+  padding: 8px 10px; border-radius: 9px; font-size: 13px;
+  color: var(--texto); font-weight: 500; transition: .15s; text-align: left;
+}
+.anio-btn:hover { background: rgba(58,191,181,.1); color: var(--teal3); }
+.anio-btn.act { background: rgba(58,191,181,.18); color: var(--teal3); font-weight: 700; border-left: 3px solid var(--teal); }
 
-/* Mantén la etiqueta (Ascenso / Pronta Ascensión) con su propio estilo */
-.list li.ascenso::after{
-  text-transform: none;
+/* ============================================================
+   DRAWER (FILTROS MÓVIL)
+   Panel lateral que se desliza desde la izquierda en móvil
+   ============================================================ */
+.drawer-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1500;
+  background: rgba(10,10,10,.6); backdrop-filter: blur(4px);
 }
-/* === Centrar nombres en tarjetas de participantes (PC y móvil) === */
-.list li{
+.drawer-overlay.vis { display: block; }
+.drawer {
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 1501;
+  width: min(320px, 88vw);
+  background: #fff; overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform .32s cubic-bezier(.4,0,.2,1);
+  box-shadow: 4px 0 40px rgba(0,0,0,.25);
+  display: flex; flex-direction: column;
+}
+.drawer.vis { transform: translateX(0); }
+.drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--gris-claro);
+  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+  flex-shrink: 0;
+}
+.drawer-header-title { font-size: 15px; font-weight: 700; color: #fff; }
+.drawer-header-sub { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 2px; }
+.drawer-close {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,.1); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: #fff; transition: .2s;
+}
+.drawer-close:hover { background: rgba(58,191,181,.3); }
+.drawer-body { padding: 18px 16px; flex: 1; }
+.drawer-section-title {
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--muted); margin-bottom: 10px; padding: 0 4px;
+}
+.drawer-sep { height: 1px; background: var(--gris-claro); margin: 16px 0; }
+.drawer-cat-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; background: none; border: none; cursor: pointer;
+  padding: 10px 12px; border-radius: 10px;
+  font-size: 14px; color: var(--texto); font-weight: 500;
+  transition: .15s; text-align: left; margin-bottom: 3px;
+}
+.drawer-cat-btn:hover { background: rgba(58,191,181,.1); color: var(--teal3); }
+.drawer-cat-btn.act { background: var(--teal); color: #fff; font-weight: 600; }
+.drawer-cat-btn.act .cat-count { background: rgba(255,255,255,.25); color: #fff; }
+.drawer-anio-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; background: none; border: none; cursor: pointer;
+  padding: 10px 12px; border-radius: 10px; font-size: 14px;
+  color: var(--texto); font-weight: 500; transition: .15s; text-align: left; margin-bottom: 3px;
+}
+.drawer-anio-btn:hover { background: rgba(58,191,181,.1); color: var(--teal3); }
+.drawer-anio-btn.act { background: rgba(58,191,181,.15); color: var(--teal3); font-weight: 700; border-left: 3px solid var(--teal); }
+.drawer-footer {
+  padding: 16px; border-top: 1px solid var(--gris-claro); flex-shrink: 0;
+}
+.drawer-aplicar {
+  display: block; width: 100%; text-align: center;
+  background: var(--teal); color: #fff; font-weight: 700; font-size: 14px;
+  padding: 13px; border-radius: 11px; border: none; cursor: pointer; transition: .2s;
+}
+.drawer-aplicar:hover { background: var(--teal2); }
+
+/* Barra superior del catálogo (buscador + botón filtros móvil) */
+.lib-top { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+.btn-filtros-movil {
+  display: none; align-items: center; gap: 7px;
+  background: var(--fondo-card); border: 1.5px solid var(--gris-claro);
+  color: var(--texto); font-weight: 600; font-size: 13px;
+  padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: .2s; white-space: nowrap;
+}
+.btn-filtros-movil:hover { border-color: var(--teal); color: var(--teal); }
+.lib-buscar {
+  flex: 1; min-width: 180px;
+  padding: 10px 16px 10px 40px;
+  border: 1.5px solid var(--gris-claro); border-radius: 10px;
+  font-size: 14px; color: var(--texto); outline: none; transition: .2s;
+  background: var(--fondo-card)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%236b7a7a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E")
+    no-repeat 13px center;
+}
+.lib-buscar:focus { border-color: var(--teal); }
+.lib-cnt { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.lib-cnt strong { color: var(--texto); }
+
+/* ============================================================
+   TARJETAS DE LIBROS
+   ============================================================ */
+.lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(185px,1fr)); gap: 18px; }
+.libro-card {
+  background: #fff; border-radius: 16px;
+  border: 1.5px solid var(--gris-claro);
+  overflow: hidden; cursor: pointer; transition: all .25s;
+}
+.libro-card:hover { transform: translateY(-5px); box-shadow: var(--sombra2); border-color: var(--teal); }
+.libro-portada {
+  height: 180px; overflow: hidden;
+  background: linear-gradient(135deg, #e8f0ef, #cde8e6);
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.libro-portada img { width: 100%; height: 100%; object-fit: cover; transition: .3s; }
+.libro-card:hover .libro-portada img { transform: scale(1.05); }
+.lib-ph { font-size: 44px; color: var(--teal); opacity: .4; }
+.id-badge {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(42,42,42,.88); color: #fff;
+  font-size: 9px; font-weight: 700; letter-spacing: .7px;
+  padding: 3px 8px; border-radius: 5px; text-transform: uppercase;
+}
+.anio-badge {
+  position: absolute; top: 8px; left: 8px;
+  background: rgba(58,191,181,.92); color: #fff;
+  font-size: 9px; font-weight: 700; padding: 3px 7px; border-radius: 5px;
+}
+.libro-body { padding: 13px 12px 12px; }
+.libro-nombre { font-size: 12px; font-weight: 700; color: var(--texto); margin-bottom: 8px; line-height: 1.4; min-height: 32px; }
+.libro-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+.meta-tag { display: inline-flex; align-items: center; gap: 3px; background: var(--fondo-card); border-radius: 5px; padding: 3px 7px; font-size: 10px; color: var(--muted); font-weight: 500; }
+.btn-ficha {
+  display: block; width: 100%; text-align: center;
+  background: var(--teal); color: #fff; font-weight: 700; font-size: 12px;
+  padding: 9px; border-radius: 8px; border: none; cursor: pointer; transition: .2s;
+}
+.btn-ficha:hover { background: var(--teal2); }
+.sin-res { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--muted); }
+.sin-res-icon { font-size: 48px; margin-bottom: 10px; }
+
+/* ============================================================
+   MODAL FICHA TÉCNICA
+   ============================================================ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 2000;
+  background: rgba(10,10,10,.88); backdrop-filter: blur(8px);
+  align-items: center; justify-content: center; padding: 16px;
+}
+.modal-overlay.abierto { display: flex; }
+.modal-caja {
+  background: #fff; border-radius: 24px;
+  max-width: 760px; width: 100%; max-height: 92vh; overflow-y: auto;
+  box-shadow: 0 28px 90px rgba(0,0,0,.55);
+  animation: mEnt .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes mEnt { from{opacity:0;transform:scale(.88)} to{opacity:1;transform:scale(1)} }
+@keyframes bookFloat { 0%{transform:translateY(0) scale(1)} 100%{transform:translateY(-10px) scale(1.02)} }
+
+/* Portada del libro limpia en el modal */
+.book-cover-wrap {
   position: relative;
   display: flex;
-  align-items: center;          /* centra verticalmente el texto */
-  justify-content: center;      /* centra horizontalmente el texto */
-  text-align: center;           /* si hay 2 líneas, que se centren */
+  align-items: center;
+  justify-content: center;
+  width: 260px;
+  animation: bookFloat 4s ease-in-out infinite alternate;
+  cursor: zoom-in;
+}
+.book-cover-wrap img {
   width: 100%;
-  padding-left: clamp(40px, 3.2vw, 56px);  /* espacio para el icono */
-  line-height: 1.2;
-  white-space: normal !important;          /* permite 2 líneas si hace falta */
+  max-height: 360px;
+  object-fit: contain;
+  border-radius: 10px;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.75)) drop-shadow(0 4px 12px rgba(58,191,181,0.3));
+  transition: transform .3s ease;
 }
+.book-cover-wrap:hover img { transform: scale(1.04); }
 
-/* Icono a la izquierda, centrado verticalmente */
-.list li::before{
+/* Hint de zoom — badge flotante sobre la imagen */
+.zoom-hint {
   position: absolute;
-  left: clamp(10px, 1.2vw, 14px);
-  top: 50%;
-  transform: translateY(-50%);
-  margin: 0;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10,10,10,.68);
+  border: 1px solid rgba(58,191,181,.5);
+  backdrop-filter: blur(6px);
+  border-radius: 30px;
+  padding: 6px 14px 6px 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: hintPulse 2.8s ease-in-out infinite;
+  z-index: 10;
+}
+.zoom-hint-icon {
+  font-size: 14px;
+  line-height: 1;
+  animation: hintBounce 2.8s ease-in-out infinite;
+}
+.zoom-hint-text {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,.9);
+  letter-spacing: .2px;
+}
+@keyframes hintPulse {
+  0%,100% { opacity:.75; box-shadow: 0 0 0 0 rgba(58,191,181,0); }
+  50%      { opacity:1;   box-shadow: 0 0 12px 2px rgba(58,191,181,.25); }
+}
+@keyframes hintBounce {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.2); }
 }
 
-/* Ajuste fino para móviles */
-@media (max-width: 768px){
-  .list li{
-    padding-left: 44px;         /* un poco menos de sangría */
-    font-size: 15.5px;          /* sube/baja si hace falta */
-  }
+/* Zoom de imagen - lightbox */
+.img-zoom-overlay {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,.92); backdrop-filter: blur(6px);
+  align-items: center; justify-content: center; cursor: zoom-out;
 }
+.img-zoom-overlay.vis { display: flex; }
+.img-zoom-overlay img {
+  max-width: 90vw; max-height: 90vh;
+  object-fit: contain; border-radius: 14px;
+  box-shadow: 0 0 80px rgba(58,191,181,.3);
+  animation: zoomIn .25s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes zoomIn { from{opacity:0;transform:scale(.7)} to{opacity:1;transform:scale(1)} }
+.img-zoom-close {
+  position: absolute; top: 18px; right: 22px;
+  background: rgba(255,255,255,.15); border: none; color: #fff;
+  font-size: 26px; border-radius: 50%; width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: .2s;
+}
+.img-zoom-close:hover { background: rgba(58,191,181,.4); }
+.modal-inner { display: grid; grid-template-columns: 1fr 1fr; min-height: 460px; }
+.modal-izq {
+  background: linear-gradient(150deg, #1a3a38 0%, #0f2e2c 40%, #1a4a47 100%);
+  border-radius: 24px 0 0 24px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 30px 22px; position: relative; overflow: hidden;
+}
+/* Fondo animado de partículas/burbujas turquesa */
+.modal-izq::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(58,191,181,.35) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(42,168,158,.28) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 50%, rgba(29,143,134,.15) 0%, transparent 70%);
+  animation: bgPulse 4s ease-in-out infinite alternate;
+}
+@keyframes bgPulse {
+  0%   { opacity: .8; }
+  100% { opacity: 1; transform: scale(1.05); }
+}
+.modal-izq::after {
+  content: '';
+  position: absolute; bottom: -40px; right: -40px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(58,191,181,.12);
+  animation: burbuja1 5s ease-in-out infinite alternate;
+}
+@keyframes burbuja1 {
+  0%   { transform: translate(0,0) scale(1); }
+  100% { transform: translate(-20px,-25px) scale(1.15); }
+}
+/* Burbujas adicionales */
+.modal-izq .burbuja-tl {
+  position: absolute; top: -30px; left: -30px;
+  width: 130px; height: 130px; border-radius: 50%;
+  background: rgba(58,191,181,.10);
+  animation: burbuja2 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes burbuja2 {
+  0%   { transform: translate(0,0) scale(1); }
+  100% { transform: translate(18px,22px) scale(1.12); }
+}
+.modal-izq .burbuja-mid {
+  position: absolute; top: 50%; left: 15%;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(58,191,181,.08); border: 1px solid rgba(58,191,181,.15);
+  animation: burbuja3 7s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes burbuja3 {
+  0%   { transform: translate(0,0) scale(1); opacity:.6; }
+  100% { transform: translate(12px,-18px) scale(1.2); opacity:1; }
+}
+/* Líneas decorativas tipo grid */
+.modal-izq .grid-deco {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(58,191,181,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(58,191,181,.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridMove 8s linear infinite;
+}
+@keyframes gridMove {
+  0%   { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+/* Avatar del doctor flotando */
+.modal-izq .avatar-fondo {
+  position: absolute; inset: 0; pointer-events: none;
+  display: flex; align-items: flex-end; justify-content: center;
+  overflow: hidden;
+}
+.modal-izq .avatar-fondo img {
+  width: 78%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  opacity: .18;
+  filter: saturate(0) brightness(1.8);
+  animation: avatarFlota 5s ease-in-out infinite alternate;
+}
+@keyframes avatarFlota {
+  0%   { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-12px) scale(1.03); }
+}
+.ipad-wrap { position: relative; z-index: 1; width: 178px; }
+.ipad-wrap svg { width: 100%; filter: drop-shadow(0 18px 44px rgba(0,0,0,.6)); }
+.ipad-screen {
+  position: absolute; top: 7%; left: 7%;
+  width: 86%; height: 82%; border-radius: 4px; overflow: hidden;
+  background: #0d1f1e; display: flex; align-items: center; justify-content: center;
+}
+.ipad-screen img { width: 100%; height: 100%; object-fit: cover; }
+.ipad-screen .ph-emoji { font-size: 36px; opacity: .5; color: var(--teal); }
+.modal-der { padding: 26px; display: flex; flex-direction: column; justify-content: space-between; }
+.modal-cerrar {
+  align-self: flex-end; background: var(--fondo-card);
+  border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 15px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: .2s; margin-bottom: 12px; color: var(--muted);
+}
+.modal-cerrar:hover { background: var(--gris-claro); }
+.m-cat {
+  display: inline-block; background: rgba(58,191,181,.12); color: var(--teal3);
+  font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 50px;
+  margin-bottom: 8px; border: 1px solid rgba(58,191,181,.2);
+}
+.m-titulo { font-size: 17px; font-weight: 800; color: var(--gris2); margin-bottom: 18px; line-height: 1.3; }
+.m-detalles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+.det-item { background: transparent; border-radius: 10px; padding: 11px 13px; border: 1px solid rgba(58,191,181,.1); }
+.det-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 3px; }
+.det-valor { font-size: 13px; font-weight: 700; color: var(--texto); }
+.m-acciones { display: flex; flex-direction: column; gap: 9px; }
+.btn-m-ok {
+  display: block; text-align: center; background: var(--teal); color: #fff;
+  font-weight: 700; font-size: 14px; padding: 13px; border-radius: 10px;
+  border: none; cursor: pointer; text-decoration: none; transition: .2s;
+}
+.btn-m-ok:hover { background: var(--teal2); transform: translateY(-2px); }
+.btn-m-no {
+  display: block; text-align: center; background: var(--fondo-card); color: var(--muted);
+  font-weight: 600; font-size: 14px; padding: 13px; border-radius: 10px;
+  border: 1.5px solid var(--gris-claro); cursor: pointer; transition: .2s;
+}
+.btn-m-no:hover { background: var(--gris-claro); }
 
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer { background: var(--fondo-footer); color: rgba(255,255,255,.62); padding: 50px 5% 28px; }
+.foot-grid {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 36px;
+  padding-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,.1); margin-bottom: 22px;
+}
+.foot-logo-text { display: flex; flex-direction: column; line-height: 1; margin-bottom: 14px; }
+.foot-logo-ebook { font-size: 20px; font-weight: 900; color: #fff; letter-spacing: -.3px; }
+.foot-logo-sub { font-size: 9px; font-weight: 700; color: var(--teal); letter-spacing: 2.5px; text-transform: uppercase; margin-top: 3px; }
+.foot-desc { font-size: 14px; line-height: 1.7; margin-bottom: 18px; }
+.foot-social { display: flex; gap: 8px; }
+.soc-btn {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: rgba(255,255,255,.08); display: flex; align-items: center;
+  justify-content: center; color: rgba(255,255,255,.65); font-size: 16px;
+  text-decoration: none; transition: .2s; border: 1px solid rgba(255,255,255,.1);
+}
+.soc-btn:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
+.foot-col-tit { font-size: 11px; font-weight: 700; color: #fff; letter-spacing: .5px; margin-bottom: 14px; text-transform: uppercase; }
+.foot-links { list-style: none; }
+.foot-links li { margin-bottom: 8px; }
+.foot-links a { color: rgba(255,255,255,.52); text-decoration: none; font-size: 13px; transition: .2s; }
+.foot-links a:hover { color: var(--teal); }
+.foot-copy { max-width: 1100px; margin: 0 auto; text-align: center; font-size: 12px; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width: 980px) {
+  .nos-wrap { grid-template-columns: 1fr; }
+  .lib-layout { grid-template-columns: 1fr; }
+  .lib-sidebar { display: none; } /* Se reemplaza por el drawer */
+  .btn-filtros-movil { display: flex; }
+  .modal-inner { grid-template-columns: 1fr; }
+  .modal-izq { border-radius: 24px 24px 0 0; padding: 22px; min-height: 220px; }
+  .foot-grid { grid-template-columns: 1fr; gap: 20px; }
+}
+@media(max-width: 640px) {
+  .nav-links { display: none; }
+  .nav-mp-btn { display: none; }
+  .hamburger { display: flex; }
+  .hero-btns { flex-direction: column; align-items: flex-start; }
+  .hero-stats { max-width: 100%; }
+  section { padding: 60px 5%; }
+  #carrusel { padding: 38px 0; }
+  .nos-stats-grid { grid-template-columns: 1fr 1fr; }
+}
 </style>
 </head>
 <body>
-  <!-- ===== Header ===== -->
-  <header>
-    <div class="container nav">
-      <a class="brand" href="#inicio" aria-label="Ir al inicio">
-        <img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/LOGO-AOTAP.webp" alt="Logo" width="36" height="36" loading="lazy"/>
-        <div class="title">AOTAP</div>
-      </a>
-      <button class="burger" id="burger" aria-expanded="false" aria-controls="mainmenu">☰</button>
-      <ul class="menu" id="mainmenu">
-        <li><a href="#quienes-somos">Quiénes somos</a></li>
-        <li><a href="#categorizacion">Categorización</a></li>
-        <li><a href="#marcas">Comunidades</a></li>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav>
+  <!-- Logo tipo texto (estilo del logo original) -->
+  <a href="#inicio" class="nav-logo">
+    <!-- Ícono libro/tablet (igual al del logo) -->
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Tablet/dispositivo -->
+        <rect x="8" y="4" width="18" height="26" rx="3" fill="#3d3d3d"/>
+        <rect x="10" y="7" width="14" height="20" rx="1.5" fill="#1a1a1a"/>
+        <circle cx="17" cy="29" r="1.2" fill="#555"/>
+        <!-- Libro abierto encima -->
+        <path d="M14 10 Q20 7 26 10 L26 26 Q20 23 14 26 Z" fill="var(--teal)" opacity=".9"/>
+        <path d="M20 10 L20 26" stroke="rgba(255,255,255,.3)" stroke-width=".8"/>
+        <!-- Páginas -->
+        <path d="M14 10 Q20 7 26 10" stroke="rgba(255,255,255,.2)" stroke-width=".6" fill="none"/>
+      </svg>
+    </div>
+    <div class="nav-logo-text">
+      <span class="nav-logo-ebook">EBOOK</span>
+      <span class="nav-logo-sub">de Odontología</span>
+    </div>
+  </a>
+
+  <!-- Links desktop -->
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#inicio" class="act" onclick="setAct(this)">Inicio</a></li>
+    <li><a href="#libros" onclick="setAct(this)">Catálogo</a></li>
+    <li><a href="#nosotros" onclick="setAct(this)">Nosotros</a></li>
+  </ul>
+
+  <!-- Botón MegaPack desktop -->
+  <a href="#" class="nav-mp-btn" onclick="irMegapack(event)">
+    <span class="nav-mp-dot"></span> MegaPack 🔥
+  </a>
+
+  <!-- Hamburguesa móvil -->
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ============================================================
+     MENÚ MÓVIL (panel deslizable desde arriba)
+     ============================================================ -->
+<div class="mobile-menu-overlay" id="mmOverlay" onclick="closeMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <!-- Cabecera con avatar/marca -->
+  <div class="mm-header">
+    <div class="mm-avatar">📚</div>
+    <div>
+      <div class="mm-brand-name">Ebook de Odontología</div>
+      <div class="mm-brand-sub">Biblioteca Digital Especializada</div>
+    </div>
+  </div>
+  <!-- Links de navegación -->
+  <div class="mm-links">
+    <a href="#inicio" class="mm-link act" onclick="closeMobile(this)">
+      <span class="mm-link-icon">🏠</span>
+      <span>Inicio</span>
+    </a>
+    <a href="#libros" class="mm-link" onclick="closeMobile(this)">
+      <span class="mm-link-icon">📚</span>
+      <span>Catálogo de libros</span>
+    </a>
+    <a href="#nosotros" class="mm-link" onclick="closeMobile(this)">
+      <span class="mm-link-icon">👥</span>
+      <span>Nosotros</span>
+    </a>
+  </div>
+  <div class="mm-sep"></div>
+  <!-- MegaPack destacado -->
+  <a href="#" class="mm-megapack" onclick="irMegapack(event)">
+    <div class="mm-megapack-left">
+      <div class="mm-megapack-icon">🔥</div>
+      <div>
+        <div style="font-size:14px;font-weight:700">MegaPack Especial</div>
+        <div style="font-size:11px;opacity:.65;margin-top:2px">Todo el catálogo · Un solo pago</div>
+      </div>
+    </div>
+    <span class="mm-megapack-arrow">›</span>
+  </a>
+</div>
+
+<!-- ============================================================
+     HERO PREMIUM — Canvas + Aurora + Libros 3D (mobile-first)
+     ============================================================ -->
+<section id="inicio">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-aurora"></div>
+  <div class="hero-aurora2"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-beam"></div>
+
+  <!-- Contenedor interno: columna en móvil, fila en desktop -->
+  <div class="hero-inner">
+
+    <!-- Panel de libros 3D (arriba en móvil, derecha en desktop) -->
+    <div class="hero-right">
+      <div class="hero-books">
+        <div class="hb-glow"></div>
+        <div class="hb hb-top"></div>
+        <div class="hb hb-left"></div>
+        <div class="hb hb-right"></div>
+        <div class="hb hb-main">
+          <div class="hb-spine"></div>
+          <div class="hb-main-inner">
+            <div class="hb-tag">Odontología Digital</div>
+            <div class="hb-title">Biblioteca Especializada para Profesionales</div>
+            <div class="hb-lines">
+              <div class="hb-line" style="width:90%"></div>
+              <div class="hb-line"></div>
+              <div class="hb-line"></div>
+            </div>
+            <div class="hb-icon">🦷</div>
+          </div>
+        </div>
+        <div class="hb-badge hb-badge-1">
+          <span class="hb-badge-dot" style="background:#3ABFB5"></span>+80 Títulos disponibles
+        </div>
+        <div class="hb-badge hb-badge-2">
+          <span class="hb-badge-dot" style="background:#f59e0b"></span>PDF · Descarga inmediata
+        </div>
+        <div class="hb-badge hb-badge-3">
+          <span class="hb-badge-dot" style="background:#34d399"></span>Actualizado 2026
+        </div>
+      </div>
+    </div>
+
+    <!-- Texto del hero (abajo en móvil, izquierda en desktop) -->
+    <div class="hero-contenido">
+      <div class="hero-badge"><span class="hero-dot"></span>Biblioteca Digital Especializada</div>
+      <h1 class="hero-titulo">El conocimiento<br>odontológico<br><span>en tus manos</span></h1>
+      <p class="hero-desc">Accede a los mejores libros de Odontología en formato digital. Material especializado, actualizado y listo para descargar de inmediato.</p>
+      <div class="hero-btns">
+        <a href="#libros" class="btn-catalogo">📖 Ver catálogo completo</a>
+        <a href="#" class="btn-mp-hero" onclick="irMegapack(event)">🔥 MegaPack especial</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><span class="stat-num">+80</span><span class="stat-label">Ebook<br>disponibles</span></div>
+        <div class="stat-item"><span class="stat-num">+8K</span><span class="stat-label">Profesionales<br>satisfechos</span></div>
+        <div class="stat-item"><span class="stat-num">15</span><span class="stat-label">Países<br>con lectores</span></div>
+      </div>
+    </div>
+
+  </div><!-- /hero-inner -->
+</section>
+
+<!-- ============================================================
+     CARRUSEL DE LIBROS
+     ============================================================ -->
+<div id="carrusel">
+  <div class="carrusel-header">
+    <p>Destacados del catálogo</p>
+    <h3>Algunos de nuestros <span>títulos más populares</span></h3>
+  </div>
+  <div class="carrusel-track-wrap" id="carruselWrap">
+    <div class="carrusel-fade-l"></div>
+    <div class="carrusel-track" id="carruselTrack"></div>
+    <div class="carrusel-fade-r"></div>
+  </div>
+  <div class="swipe-hint">
+    <span class="swipe-hint-inner">
+      <span class="swipe-hint-arrow">👈</span> Desliza para ver más <span class="swipe-hint-arrow" style="animation-delay:.2s">👉</span>
+    </span>
+  </div>
+</div>
+
+<!-- ============================================================
+     CATÁLOGO / BIBLIOTECA
+     ============================================================ -->
+<section id="libros">
+  <div class="lib-wrap">
+    <div class="sec-header">
+      <div class="sec-tag">Biblioteca Digital</div>
+      <h2 class="sec-titulo">CATÁLOGO <span>COMPLETO</span></h2>
+      <p class="sec-desc">Filtra por especialidad o año. Haz clic en cualquier libro para ver su ficha técnica.</p>
+    </div>
+    <div class="lib-layout">
+      <!-- Sidebar (solo visible en desktop) -->
+      <div class="lib-sidebar" id="sidebar">
+        <div id="sidebarCats"><div class="sidebar-titulo">Especialidades</div></div>
+        <div id="sidebarAniosWrap" style="margin-top:14px">
+          <div class="sidebar-titulo">Año de edición</div>
+          <div id="sidebarAnios"></div>
+        </div>
+      </div>
+      <!-- Grid principal -->
+      <div class="lib-main">
+        <div class="lib-top">
+          <!-- Botón filtros (solo móvil) -->
+          <button class="btn-filtros-movil" onclick="abrirDrawer()">
+            ☰ Filtros
+          </button>
+          <input type="text" class="lib-buscar" id="buscador" placeholder="Buscar libro..." oninput="aplicarFiltros()">
+          <div class="lib-cnt" id="libCnt">Mostrando <strong>0</strong> resultados</div>
+        </div>
+        <div class="lib-grid" id="librosGrid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     NOSOTROS
+     ============================================================ -->
+<section id="nosotros">
+  <div class="nos-wrap">
+    <div class="nos-stats-grid">
+      <div class="nos-stat-card">
+        <span class="nos-stat-icon">📚</span>
+        <span class="nos-stat-num">+90</span>
+        <span class="nos-stat-label">Ebook especializados en Odontología</span>
+      </div>
+      <div class="nos-stat-card">
+        <span class="nos-stat-icon">🌎</span>
+        <span class="nos-stat-num">15</span>
+        <span class="nos-stat-label">Países con profesionales lectores</span>
+      </div>
+      <div class="nos-stat-card">
+        <span class="nos-stat-icon">⭐</span>
+        <span class="nos-stat-num">4.9</span>
+        <span class="nos-stat-label">Calificación promedio de clientes</span>
+      </div>
+      <div class="nos-stat-card">
+        <span class="nos-stat-icon">🎓</span>
+        <span class="nos-stat-num">+8K</span>
+        <span class="nos-stat-label">Profesionales satisfechos en todo el Pais</span>
+      </div>
+    </div>
+    <div>
+      <div class="nos-tag">Sobre nosotros</div>
+      <h2 class="nos-titulo">La biblioteca digital para odontólogos que quieren <span>crecer</span></h2>
+      <p class="nos-p">Nacimos con una misión clara: hacer que el conocimiento odontológico de calidad sea accesible para todos los profesionales, sin importar dónde estén.</p>
+      <p class="nos-p">Nuestro catálogo está cuidadosamente curado con los mejores títulos de autores reconocidos, abarcando todas las especialidades odontológicas.</p>
+      <ul class="nos-lista">
+        <li><span class="nos-check">✓</span><span>Material 100% digital, descarga inmediata tras la compra</span></li>
+        <li><span class="nos-check">✓</span><span>Libros en español en Formato PDF</span></li>
+        <li><span class="nos-check">✓</span><span>Catálogo actualizado constantemente con nuevos títulos</span></li>
+        <li><span class="nos-check">✓</span><span>Atención personalizada por WhatsApp siempre disponible</span></li>
+        <li><span class="nos-check">✓</span><span>Compra segura con múltiples métodos de pago</span></li>
       </ul>
     </div>
-  </header>
+  </div>
+</section>
 
-  <!-- ===== VISTA: HOME ===== -->
-  <div id="view-home" class="view active">
-    <!-- Cambia la imagen del fondo aquí -->
-    <section class="hero-wrap" id="hero" data-bg="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/Copia-de-Green-and-White-Modern-Bold-Tennis-Course-Sport-Presentation-7.jpg">
-      <div class="hero-bg" aria-hidden="true"></div>
-      <div class="hero-card">
-        <div class="kicker"></div>
-        <h1 class="hero-title">BIENVENIDO A LA<small></small>AOTAP</h1>
-        <a class="cta" href="https://whatsapp.com/channel/0029Vb6DHdt5Ejxw0Buf3j42" target="_blank" rel="noopener">UNETE A NUESTRO CANAL</small>
-        </a>
+<!-- ============================================================
+     DRAWER DE FILTROS (móvil)
+     ============================================================ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="cerrarDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-header-title">Filtrar libros</div>
+      <div class="drawer-header-sub">Especialidad y año de edición</div>
+    </div>
+    <button class="drawer-close" onclick="cerrarDrawer()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section-title">Especialidades</div>
+    <div id="drawerCats"></div>
+    <div class="drawer-sep"></div>
+    <div class="drawer-section-title">Año de edición</div>
+    <div id="drawerAnios"></div>
+  </div>
+  <div class="drawer-footer">
+    <button class="drawer-aplicar" onclick="cerrarDrawer()">✓ Aplicar filtros</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL FICHA TÉCNICA
+     ============================================================ -->
+<div class="modal-overlay" id="modal" onclick="cerrarFuera(event)">
+  <div class="modal-caja">
+    <div class="modal-inner">
+      <div class="modal-izq">
+        <!-- Decoraciones de fondo animadas -->
+        <div class="grid-deco"></div>
+        <div class="burbuja-tl"></div>
+        <div class="burbuja-mid"></div>
+
+        <!-- Portada del libro limpia con sombra y animación -->
+        <div style="position:relative;z-index:2;width:100%;height:100%;display:flex;align-items:center;justify-content:center;";display: flex-grow 90>
+          <div class="book-cover-wrap" onclick="abrirZoom(event)">
+            <img id="ipadEmoji" src="" alt="" style="display:none;">
+            <div id="ipadPh" style="font-size:60px;opacity:.35;">📖</div>
+            <div class="zoom-hint">
+              <span class="zoom-hint-icon">🔍</span>
+              <span class="zoom-hint-text">Toca para ampliar</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
-
-    <main class="container">
-     
-      <!-- Categorización (glow visible) -->
-      <section id="categorizacion" class="reveal" aria-labelledby="cat-title">
-        <div class="center">
-          <h2 id="cat-title">CATEGORIZACIÓN</h2>
-          <p class="section-lead">Elige una categoría para ver la lista de participantes.</p>
+      <div class="modal-der">
+        <div>
+          <button class="modal-cerrar" onclick="cerrarModal()">✕</button>
+          <div class="m-cat" id="mCat">Odontología</div>
+          <h3 class="m-titulo" id="mTitulo"></h3>
         </div>
-        <div class="grid">
-          <article class="card">
-            <div class="thumb"><img src="https://i.pinimg.com/1200x/12/e1/e5/12e1e5ec1a4e86e033ff82abea08f314.jpg" alt="Logo 5TA P" loading="lazy"/></div>
-            <div class="body">
-              <div class="tag"><span class="dot"></span>5TA P</div>
-              <a class="btn" href="#participantes-5ta-p">Ver Participantes</a>
-            </div>
-          </article>
-          <article class="card">
-            <div class="thumb"><img src="https://i.pinimg.com/1200x/12/e1/e5/12e1e5ec1a4e86e033ff82abea08f314.jpg" alt="Logo 5TA B" loading="lazy"/></div>
-            <div class="body">
-              <div class="tag"><span class="dot"></span>5TA B</div>
-              <a class="btn" href="#participantes-5ta-b">Ver Participantes</a>
-            </div>
-          </article>
-          <article class="card">
-            <div class="thumb"><img src="https://i.pinimg.com/1200x/12/e1/e5/12e1e5ec1a4e86e033ff82abea08f314.jpg" alt="Logo 5TA A" loading="lazy"/></div>
-            <div class="body">
-              <div class="tag"><span class="dot"></span>5TA A</div>
-              <a class="btn" href="#participantes-5ta-a">Ver Participantes</a>
-            </div>
-          </article>
-          <article class="card">
-            <div class="thumb"><img src="https://i.pinimg.com/1200x/12/e1/e5/12e1e5ec1a4e86e033ff82abea08f314.jpg" alt="Logo 4TA" loading="lazy"/></div>
-            <div class="body">
-              <div class="tag"><span class="dot"></span>4TA</div>
-              <a class="btn" href="#participantes-4ta">Ver Participantes</a>
-            </div>
-          </article>
+        <div class="m-detalles" id="mDetalles"></div>
+        <div class="m-acciones">
+          <a href="#" class="btn-m-ok" id="btnConsultar" onclick="consultarLibro(event)">💬 Consultar libro</a>
+          <button class="btn-m-no" onclick="cerrarModal()">Cerrar ficha</button>
         </div>
-      </section>
-      <!-- Quiénes somos -->
-      <section id="quienes-somos" class="reveal">
-        <div class="center">
-          <h2>Quiénes somos</h2>
-          <p class="section-lead">
-            Somos una Asociación de Organizadores de Tenis Amateur del Perú. Trabajamos juntos para que cada jugador viva torneos bien organizados, con transparencia, respeto y un auténtico espíritu deportivo.
-          </p>
-        </div>
-        <div class="qs-grid">
-          <article class="qs-card"><h3>Misión</h3><p>Fomentar el desarrollo del tenis amateur en el Perú a través de la unión de organizadores comprometidos con la calidad, la transparencia y la equidad en la competencia. Buscamos brindar respaldo y estándares comunes que garanticen una mejor experiencia para todos los jugadores.</p></article>
-          <article class="qs-card"><h3>Visión</h3><p>Construir un entorno donde cada jugador de tenis amateur disfrute de torneos bien organizados, justos y con sentido de comunidad. Queremos que cada participante se sienta parte de algo más grande: una red de organizadores que trabajan con amistad, respeto y pasión para hacer del tenis una experiencia cada vez mejor.</p></article>
-        </div>
-      </section>
-    </main>
+      </div>
+    </div>
   </div>
+</div>
 
-  <!-- ===== VISTA: PARTICIPANTES ===== -->
-  <div id="view-part" class="view">
-    <main class="container">
-      <section id="participantes-5ta-p" class="panel">
-        <h2>Categorización - 5TA Principiante</h2>
-        <div class="panel-search"><input type="search" class="search" placeholder="Buscar en 5TA P..." aria-label="Buscar en 5TA P"><div class="ac-list" role="listbox"></div></div>
-        <ul class="list">
-          <li class="ascenso">ANTHONY AMARO</li>
-          <li class="ascenso">CESAR ALIPAZAGA</li>
-          <li class="ascenso">CESAR ALVARADO</li>
-          <li class="ascenso">FAVIO TORRES</li>
-          <li class="ascenso">IVONNE LAZO</li>
-          <li class="ascenso">JENNIFER FRIAS</li>
-          <li class="ascenso">JORGE CHANG</li>
-          <li class="ascenso">LUIS CARRILLO</li>
-          <li class="ascenso">MANUEL JIMENEZ</li>
-          <li class="ascenso">MILIN GRANDA</li>
-          <li class="ascenso">SEBASTIAN HORNA</li>
-          <li class="ascenso">SERGIO CARRILLO</li>
-          <li class="ascenso">VICTOR RODRIGUEZ</li>
-          <li class="ascenso">ZIANI ECHEVARRIA</li>
-          <li>AARON BALLESTEROS</li>
-          <li>ADRIÁN VILLENA</li>
-          <li>ADRIANA HUAMANÍ</li>
-          <li>ADRIANA VILLAFUERTE</li>
-          <li>ALBERTO JAIME</li>
-          <li>ALDO MORALES</li>
-          <li>ALEJANDRO CARRILLO</li>
-          <li>ALEJANDRO CORDERO</li>
-          <li>ALEJANDRO ROMAN</li>
-          <li>ALESSIO CASTELLANO</li>
-          <li>ALEX ASPILCUETA</li>
-          <li>ALEX CASTRO</li>
-          <li>ALEX TORRES</li>
-          <li>ALEXANDER DONAIRE</li>
-          <li>ALEXANDRA ARAPA</li>
-          <li>ALEXIS MEDINA</li>
-          <li>ALFONSO PAUCAR</li>
-          <li>ALFREDO CÁCERES</li>
-          <li>ALONSO CASTRO</li>
-          <li>ALVARO SANTA CRUZ</li>
-          <li>ANA CHÁVEZ</li>
-          <li>ANDERSON BARBOZA</li>
-          <li>ANDREA VARGAS</li>
-          <li>ANDREA ZERPA</li>
-          <li>ANGELICA VASQUEZ</li>
-          <li>ANGELO NAVARRO</li>
-          <li>ARTURO BEJARANO</li>
-          <li>AXEEL DE LA CRUZ</li>
-          <li>BETTY BURGOS</li>
-          <li>BILL HINOSTROZA</li>
-          <li>BLAS FIGUEROA</li>
-          <li>BRUNO HERRERA</li>
-          <li>BRUNO RIOS</li>
-          <li>BRYAN PALOMINO</li>
-          <li>BYEONGJU SAONG</li>
-          <li>CAMILA BRAVO</li>
-          <li>CAMILA CONDORI</li>
-          <li>CAMILO RAMOS</li>
-          <li>CARLOS CAMPOS</li>
-          <li>CARLOS CHAMORRO</li>
-          <li>CARLOS OVIEDO</li>
-          <li>CARLOS PALOMINO</li>
-          <li>CARLOS PORTILLA</li>
-          <li>CARLOS QUISPE</li>
-          <li>CARLOS RIOS</li>
-          <li>CHRISTIAN  CARRANZA</li>
-          <li>CRISTIAN ARCE</li>
-          <li>CRISTOPHER SUCLUPE</li>
-          <li>DANIEL MANRIQUE</li>
-          <li>DANIEL RIVADENEYRA</li>
-          <li>DANIEL ROMERO</li>
-          <li>DANIEL VILLANUEVA</li>
-          <li>DAVID LOPEZ TINEO</li>
-          <li>DIANA PAREDES</li>
-          <li>DIEGO AYALA</li>
-          <li>DIEGO RUCOBA</li>
-          <li>DIEGO VILCHEZ</li>
-          <li>EDUARDO ALEXANDER</li>
-          <li>EDUARDO NUÑEZ</li>
-          <li>EDUARDO VILLALOBOS</li>
-          <li>EDWIN MUÑOZ</li>
-          <li>ELENA CCONISLLA</li>
-          <li>ELIAS HUAYTA</li>
-          <li>EZEQUIEL ALEJANDRO</li>
-          <li>FABRIZIO DIAZ</li>
-          <li>FABRIZIO PAREDES</li>
-          <li>FABRIZZIO SARA</li>
-          <li>FERNANDO DAVILA</li>
-          <li>FERNANDO ESCOBAR</li>
-          <li>FERNANDO TTITO</li>
-          <li>FIORELLA ALEJANDRIA</li>
-          <li>FIORELLA DURAND</li>
-          <li>FIORELLA LOAYZA</li>
-          <li>FRANCO VALVERDE</li>
-          <li>GERMAN IPARRAGUIRRE</li>
-          <li>GINO GALECIO</li>
-          <li>GONZALO ARRIOLA</li>
-          <li>GONZALO FALLA</li>
-          <li>GONZALO HIDALGO</li>
-          <li>GUSTAVO CASTRO</li>
-          <li>HECTOR CHUMPITAZ</li>
-          <li>HECTOR TUÑOQUE</li>
-          <li>HENRY ANCHAISE</li>
-          <li>HERNAN CAVALIE</li>
-          <li>HUGO FERNANDEZ</li>
-          <li>HUMBERTO SALDAÑA</li>
-          <li>ITALO REGALADO</li>
-          <li>JAZMIN SUCAPUCA</li>
-          <li>JEAN PAUL PAJUELO</li>
-          <li>JEFFERY MONTES</li>
-          <li>JHERSON PONCE</li>
-          <li>JHON MICCELLI</li>
-          <li>JIMMY MALDONADO</li>
-          <li>JOAO DE LA CRUZ</li>
-          <li>JOAQUÍN ARIAS</li>
-          <li>JOAQUÍN GARCÍA</li>
-          <li>JONATHAN ESTEBAN</li>
-          <li>JONATHAN PAREDES</li>
-          <li>JORDAN CERVANTES</li>
-          <li>JORDÁN YARANGA</li>
-          <li>JORGE ARAOZ</li>
-          <li>JORGE BRAVO</li>
-          <li>JORGE ÑAHUI</li>
-          <li>JORGE VENEGAS</li>
-          <li>JORVIN SILVA</li>
-          <li>JOSE ARANDA</li>
-          <li>JOSE CASTRO</li>
-          <li>JOSE LOPEZ</li>
-          <li>JOSE ROJAS</li>
-          <li>JOSE TORRES</li>
-          <li>JOSHUE HUAMANI</li>
-          <li>JUAN BURGOS</li>
-          <li>JUAN DEL CARPIO</li>
-          <li>JUAN DIAZ</li>
-          <li>JUAN GOYCOCHEA</li>
-          <li>JULIETA AROTAYPE</li>
-          <li>JULIO GONZALES</li>
-          <li>JULIO ITURRIAGA</li>
-          <li>JUNIOR ASMAT</li>
-          <li>KATHERINE CORNEJO</li>
-          <li>KEVIN CARLOS</li>
-          <li>KEVIN FARFÁN</li>
-          <li>LEONARDO BREÑA</li>
-          <li>LINO CCACCYA</li>
-          <li>LUCIA BREÑA</li>
-          <li>LUCIA MAMANI</li>
-          <li>LUIS CANALES</li>
-          <li>LUIS GONZALES</li>
-          <li>LUIS GUTIERREZ</li>
-          <li>LUIS MAURICIO</li>
-          <li>LUIS RIVERA</li>
-          <li>LUIS ZEBALLOS</li>
-          <li>MANUEL ACUÑA</li>
-          <li>MANUEL MONCADA</li>
-          <li>MANUEL TEJADA</li>
-          <li>MARCO ASPILCUETA</li>
-          <li>MARCO BRUGGMANN</li>
-          <li>MARCO SAAVEDRA</li>
-          <li>MARCO VILLANUEVA</li>
-          <li>MARIA HUAMÁN</li>
-          <li>MARTIN CIFUENTES</li>
-          <li>MARTIN LIZARRAGA</li>
-          <li>MATIAS ASHCALLAY</li>
-          <li>MATT NIETO</li>
-          <li>MAURICIO PANDO</li>
-          <li>MELISSA VEGA</li>
-          <li>MERLY PALACIOS</li>
-          <li>MIGUEL CÁRDENAS</li>
-          <li>MIGUEL CASTILLO</li>
-          <li>MILAGROS GUTIÉRREZ</li>
-          <li>NICOLAS BATALLANOS</li>
-          <li>NOELIA TICONA</li>
-          <li>OSCAR PINEDO</li>
-          <li>OSWALDO VALENCIA</li>
-          <li>PABLO VALVERDE</li>
-          <li>PAOLA CHAMBI</li>
-          <li>PATRICIO SANCHEZ</li>
-          <li>PAULO ACOSTA</li>
-          <li>PEDRO PERALTA</li>
-          <li>PEDRO PUENTE</li>
-          <li>PEDRO RAMOS</li>
-          <li>PEDRO TELLO</li>
-          <li>PERCY PORTUGUEZ</li>
-          <li>PIERO RAMOS</li>
-          <li>RAUL CHAVEZ</li>
-          <li>RAUL PEÑA</li>
-          <li>RENATO RAMÍREZ</li>
-          <li>RENZO ACOSTA</li>
-          <li>RICHARD CARO</li>
-          <li>RODOLFO HUERTAS</li>
-          <li>RODRIGO ROMAN</li>
-          <li>RONALD LEON</li>
-          <li>ROSSANA MAGUIÑO</li>
-          <li>ROXANA CALLAPIÑA</li>
-          <li>SAMUEL PECHO</li>
-          <li>SANDRA SALAS</li>
-          <li>SANTIAGO SANCHEZ</li>
-          <li>SEBASTIAN ANCCO</li>
-          <li>SEBASTIAN EZETA</li>
-          <li>SEBASTIAN ORTEAGA</li>
-          <li>SEBASTIAN PORTOCARRERO</li>
-          <li>SUSANA ORDOÑEZ</li>
-          <li>TATIANA SULLCA</li>
-          <li>VALERIA LAMAS</li>
-          <li>VALERIA PUMA</li>
-          <li>VICENTE YAMASHIRO</li>
-          <li>VICTOR FLORES</li>
-          <li>VICTOR INOCENTE</li>
-          <li>WALTER CACERES</li>
-          <li>WILDERTH COSCA</li>
-          <li>WILSON CASTAÑEDA</li>
-          <li>WILSON QUISPE</li>
-          <li>YASSER ARROYO</li>
-          <li>YOUNDWOO KIM</li>
-        <div class="no-results">No se encontraron participantes en esta categoría.</div>
-      </section>
+<!-- Zoom de imagen (lightbox) -->
+<div class="img-zoom-overlay" id="imgZoom" onclick="cerrarZoom()">
+  <button class="img-zoom-close" onclick="cerrarZoom()">✕</button>
+  <img id="imgZoomSrc" src="" alt="">
+</div>
 
-      <section id="participantes-5ta-b" class="panel">
-        <h2>Categorización – 5TA B</h2>
-        <div class="panel-search"><input type="search" class="search" placeholder="Buscar en 5TA B..." aria-label="Buscar en 5TA B"><div class="ac-list" role="listbox"></div></div>
-        <ul class="list">
-          <li class="ascenso">ADRIAN SUYO</li>
-          <li class="ascenso">ALVARADO PEREDO</li>
-          <li class="ascenso">ARTURO ARIAS</li>
-          <li class="ascenso">FRAN RAZURI</li>
-          <li class="ascenso">JACKSON ROJAS</li>
-          <li class="ascenso">JUAN BECERRA</li>
-          <li class="ascenso">PERCY CAMPOS</li>
-          <li class="ascenso">RENZO ZAGARRA</li>
-          <li class="ascenso">SEBASTIAN VILLAFUERTE</li>
-          <li>ABEL TAPIA</li>
-          <li>ABIGAIL MALPARTIDA</li>
-          <li>ADRIAN ENCISO</li>
-          <li>ADRIÁN VILLENA</li>
-          <li>ADRIANA HUAMANÍ</li>
-          <li>ADRIANA VILLAFUERTE</li>
-          <li>ALBERTO DONAYRE</li>
-          <li>ALBERTO LIMO</li>
-          <li>ALDO MORALES</li>
-          <li>ALEJANDRO CARRILLO</li>
-          <li>ALEX CASTRO</li>
-          <li>ALEXANDRA ARAPA</li>
-          <li>ALEXIS MEDINA</li>
-          <li>ALFREDO CÁCERES</li>
-          <li>ALFREDO HUAMÁN</li>
-          <li>ALFREDO POMA</li>
-          <li>ALONDRA CATPO</li>
-          <li>ALONSO ESCALANTE</li>
-          <li>ALONSO SALHUANA</li>
-          <li>ÁLVARO CHUMBES</li>
-          <li>ANA ABUID</li>
-          <li>ANA FARFAN</li>
-          <li>ANDY ZARATE</li>
-          <li>ANGEL COLLANTES</li>
-          <li>ANGÉLICA APAZA</li>
-          <li>ANGELO TORRES</li>
-          <li>ANGHELO AGUAYO</li>
-          <li>ANTHONY AMARO</li>
-          <li>ANTHONY GONZALES</li>
-          <li>ANTHONY GUTIERREZ</li>
-          <li>ANTONIO CRUZ</li>
-          <li>ANTONIO ONOFRE</li>
-          <li>ARON ALDANA</li>
-          <li>ARTURO CARREÑO</li>
-          <li>ARTURO LLUEN</li>
-          <li>AXEL MEZA</li>
-          <li>BETSY SALAZAR</li>
-          <li>BLANCA DIAZ</li>
-          <li>BRAD HILARIO</li>
-          <li>BRENDA CALLA</li>
-          <li>BRIGITTE LLAMOCCA</li>
-          <li>BRISA HUALLPA</li>
-          <li>BRUNO ALCÁNTARA</li>
-          <li>BRUNO LEÓN</li>
-          <li>BRUNO ZAGAL</li>
-          <li>BRYAN LLAMOCCA</li>
-          <li>BRYAN VILLANUEVA</li>
-          <li>CAMILA VILLARREAL</li>
-          <li>CARLA CÓNDOR</li>
-          <li>CARLOS ADRIANO</li>
-          <li>CARLOS AVILA</li>
-          <li>CARLOS CIEZA</li>
-          <li>CARLOS DESPOSORIO</li>
-          <li>CARLOS EUSCATE</li>
-          <li>CARLOS GONZALES MIRANDA</li>
-          <li>CARLOS VILLANUEVA</li>
-          <li>CECILIA APAZA</li>
-          <li>CELIA CATIRE</li>
-          <li>CELIA MAMANI</li>
-          <li>CELINA HUAYNATE</li>
-          <li>CESAR ARRUNÁTEGUI</li>
-          <li>CESAR CORZO</li>
-          <li>CHRISTIAN CARDENAS</li>
-          <li>CHRISTIAN JIMENEZ</li>
-          <li>CHRISTIAN VILLANUEVA</li>
-          <li>CLAUDIA ALVARADO</li>
-          <li>CLAUDIA LAURA</li>
-          <li>CLAUDIA SALHUANA</li>
-          <li>CLAUDIA ZERPA</li>
-          <li>CRISTHIAN BELLIDO</li>
-          <li>CRISTHIAN GONZALES</li>
-          <li>CRISTHIAN REYES</li>
-          <li>RISTHIAN TINCO</li>
-          <li>CRISTIAN AMPUERO</li>
-          <li>CRISTIAN RODRIGUEZ</li>
-          <li>CRISTIAN SEGOVIA</li>
-          <li>CRISTIAN TOLEDO</li>
-          <li>DANIEL CÓRDOVA</li>
-          <li>DANIEL OYOLA</li>
-          <li>DANITZA AGUILAR</li>
-          <li>DARWIN TAIPE</li>
-          <li>DAYANA CHUQUIPIONDO</li>
-          <li>DÉBORA LLANOS</li>
-          <li>DELIA CCOPA</li>
-          <li>DENISSE CACERES</li>
-          <li>DIANA SOTOMAYOR</li>
-          <li>DIEGO ANCCO</li>
-          <li>DIEGO BENITEZ</li>
-          <li>DIEGO GONZALES</li>
-          <li>DIEGO HERNANDEZ</li>
-          <li>DIEGO MERCADO</li>
-          <li>DIEGO TAPIA</li>
-          <li>DIEGO VERA</li>
-          <li>EDGAR ARONI</li>
-          <li>EDISON MENESES</li>
-          <li>EDUARDO MENDOZA</li>
-          <li>EDUARDO QUISPEÑA</li>
-          <li>EDUARDO SALDARRIAGA</li>
-          <li>ELIAS JARA</li>
-          <li>ELIZABETH QUENTA</li>
-          <li>ELMER FLORES</li>
-          <li>ELOY GUEVARA</li>
-          <li>ELVIS MAMANI</li>
-          <li>ENRIQUE ALFARO</li>
-          <li>ENZO MEDRANO</li>
-          <li>ENZO MENDOZA</li>
-          <li>ERICK BARRERA</li>
-          <li>Erick Flores</li>
-<li>ERICK QUISPEHUARACA</li>
-<li>ERICK RAMOS</li>
-<li>ESTEFANY CUSI</li>
-<li>ESTHER TURPO</li>
-<li>EVELYN BARRIOS</li>
-<li>EVELYN QUISPEHUAMAN</li>
-<li>FABIAN SALAZAR</li>
-<li>FABIO HUAMANI</li>
-<li>FABRICIO MOLINA</li>
-<li>FABRICIO RAMOS</li>
-<li>FABRIZIO URBINA</li>
-<li>FERNANDO CIEZA</li>
-<li>FERNANDO TAPIA</li>
-<li>FIORELLA CANAZA</li>
-<li>Fiorella Godoy</li>
-<li>FLAVIA APAZA</li>
-<li>FLORENCIA TAIPE</li>
-<li>FRANCISCO PALOMINO</li>
-<li>GABRIEL GRADOS</li>
-<li>GABRIEL MESETH</li>
-<li>GABRIELA YUCRA</li>
-<li>GEANFRANCO MOLTENI</li>
-<li>Giancarlo Salazar Peña</li>
-<li>Giancarlo Tamayo</li>
-<li>GIANFRANCO QUISPE</li>
-<li>GIULIANA HUAYNATE</li>
-<li>GONZALO CHANG</li>
-<li>GONZALO MENA</li>
-<li>GONZALO PARRA</li>
-<li>GREYSI SULLCA</li>
-<li>GUSTAVO CCOPA</li>
-<li>GUSTAVO PINTO</li>
-<li>HARRY TUPAYACHI</li>
-<li>HECTOR FLORES</li>
-<li>HÉCTOR SUÁREZ</li>
-<li>Henry Garcia</li>
-<li>HENRY PAREDES</li>
-<li>HERNANDO DE LA GUERRA</li>
-<li>Hildebrando Castro-Pozo</li>
-<li>HUGO TICONA</li>
-<li>HUGO TORRES </li>
-<li>IGNACIO GOMEZ</li>
-<li>ISABELA TICONA</li>
-<li>IVÁN FLORES</li>
-<li>JAIME CASTILLO</li>
-<li>Jaime Vidal</li>
-<li>JAIR VILLENA</li>
-<li>JAVIER CORNEJO</li>
-<li>JAVIER GALARZA</li>
-<li>Javier Gomez</li>
-<li>JAZMÍN CACHI</li>
-<li>JAZMÍN MALCA</li>
-<li>JEAN PAUL ELLIS</li>
-<li>JEAN RIVERA</li>
-<li>JENNY MENDOZA</li>
-<li>JESUS DIESTRA</li>
-<li>JESÚS GAVILÁN</li>
-<li>Jesús Soriano</li>
-<li>JHENIFER CASTILLO</li>
-<li>JHON CUBA</li>
-<li>JHONATAN APAZA</li>
-<li>JHONATHAN VASQUEZ</li>
-<li>JHOSSELYN CHÁVEZ</li>
-<li>JIMENA VÁSQUEZ</li>
-<li>JIMMY AREVALO</li>
-<li>JOHN ROJAS</li>
-<li>Johnny Palma</li>
-<li>Jonathan Condori</li>
-<li>JONATHAN ESTEBAN</li>
-<li>JORGE AZALDEGUI</li>
-<li>Jorge Conislla</li>
-<li>JORGE CORNEJO</li>
-<li>JORGE REVUELTA</li>
-<li>JORGE SORIA</li>
-<li>JOSÉ CÁRDENAS</li>
-<li>JOSE EDUARDO</li>
-<li>JOSE EVANAN</li>
-<li>José Matos</li>
-<li>JOSE PAUCAR</li>
-<li>Joshua Gave</li>
-<li>JOSUE LAGOS</li>
-<li>JOSUÉ PÉREZ</li>
-<li>JUAN ALVARADO</li>
-<li>JUAN BENDEZU</li>
-<li>JUAN CAICAY</li>
-<li>JUAN DIEZ CANSECO</li>
-<li>Juan Jose Navarro</li>
-<li>JUAN LOYOLA</li>
-<li>JUAN REYNOSO</li>
-<li>JULIAN FIGUEROA</li>
-<li>JULIO JARAMILLO</li>
-<li>JULIO SIGUAS</li>
-<li>JULIO VILCHEZ</li>
-<li>Junior Asmat</li>
-<li>KAREN MAQUERA</li>
-<li>KARINA RIVAS</li>
-<li>KARINA TURPO</li>
-<li>KARITO DOMINGUEZ</li>
-<li>Karla Bozzo</li>
-<li>KARLA VILCA</li>
-<li>KATHERINE HUARACHI</li>
-<li>KATTY VALDEZ</li>
-<li>Kevin Gave</li>
-<li>KLAUS LOZANO</li>
-<li>LEONARDO PERALTA</li>
-<li>LESLIE CANAZA</li>
-<li>LIAM MALMA</li>
-<li>LIDIA SULLÓN</li>
-<li>LILIANA UCHARIMA</li>
-<li>LISSET CONTRERAS</li>
-<li>LIZETH VARGAS</li>
-<li>LORENA QUISPEHUAMAN</li>
-<li>LUANA PEÑALOZA</li>
-<li>LUCAS CÓRDOVA</li>
-<li>LUCAS HUARCAYA</li>
-<li>LUCAS VILLAVICENCIO</li>
-<li>LUCÍA BUSTAMANTE</li>
-<li>LUIS ALARCÓN</li>
-<li>LUIS ALAYO</li>
-<li>Luis Aspilicueta</li>
-<li>Luis Cam Lay</li>
-<li>Luis Estacio</li>
-<li>LUIS HERRERA</li>
-<li>LUIS JARA</li>
-<li>LUIS MORALES DELGADO</li>
-<li>LUIS VASQUEZ</li>
-<li>Magno Rios</li>
-<li>MANUEL MALLMA</li>
-<li>MARCELO CAÑARI</li>
-<li>MARCELO LAVADO</li>
-<li>MARCELO PEREZ</li>
-<li>MARCELO PUMAHUALA</li>
-<li>MARCO SALAZAR</li>
-<li>Marco Zanini</li>
-<li>MARIA ELENA AVALOS</li>
-<li>MARIANELA YUCRA</li>
-<li>Mario Cruz</li>
-<li>Mario Gomero</li>
-<li>MARLENY RIVERA</li>
-<li>MARTHA VASQUEZ</li>
-<li>MATEO MARTINEZ</li>
-<li>MATHIAS OSORIO</li>
-<li>MATÍAS REYES</li>
-<li>MAURICIO ALARCÓN</li>
-<li>MAURICIO CABRERA</li>
-<li>MAURICIO DODERO</li>
-<li>MAURICIO PEÑA</li>
-<li>MAURO AYARZA</li>
-<li>MAX DIESTRA</li>
-<li>MAXIMO GALLO</li>
-<li>MAXWELL VENTURA</li>
-<li>MAYRA COLQUE</li>
-<li>MAYRA YANAHUAYA</li>
-<li>MELINA QUISPEÑA</li>
-<li>MELISSA HUARCAYA</li>
-<li>MERY HUAYHUA</li>
-<li>MICHAEL VALVERDE</li>
-<li>Miguel Deustua</li>
-<li>MIGUEL HUAYLLANI</li>
-<li>MIGUEL MEDINA</li>
-<li>MIGUEL YARANGA</li>
-<li>MILAGROS APAZA</li>
-<li>MILAGROS UCEDA</li>
-<li>Milmarck Fernandez</li>
-<li>MÓNICA HUAMANI</li>
-<li>NATALIA TITO</li>
-<li>NATASHA CCORAHUA</li>
-<li>NATASHA CUSI</li>
-<li>NAYELI TICONA</li>
-<li>NELLY CCAPA</li>
-<li>NELSON ROJAS</li>
-<li>NICOLÁS CALISAYA</li>
-<li>Nicolas Gonzales</li>
-<li>NICOLAS NUÑEZ</li>
-<li>Nike Calle</li>
-<li>Nilton Huamanyauri </li>
-<li>NOEMI PACHECO</li>
-<li>ÓSCAR MAMANI</li>
-<li>OSCAR ORTIZ</li>
-<li>Oscar Paredes</li>
-<li>PAMELA CHURA</li>
-<li>PAOLO DURAND</li>
-<li>PATRICIO LLANQUI</li>
-<li>PAULO CALVANAPON</li>
-<li>PEDRO LAVI</li>
-<li>PEDRO OCAMPO</li>
-<li>PEPE JHONG</li>
-<li>Peter Grados</li>
-<li>PIERO ROJAS</li>
-<li>RAUL CUADROS</li>
-<li>RAUL HOSPINAL</li>
-<li>RAUL OLIVARES</li>
-<li>RAUL PORRAS</li>
-<li>RENATO MOSCOSO</li>
-<li>RENZO BARRANTES</li>
-<li>RENZO BENDEZU</li>
-<li>Renzo Ramos</li>
-<li>RICARDO HUAYTA</li>
-<li>RICARDO MENDOZA</li>
-<li>Ricardo Perez</li>
-<li>RICARDO ZEGARRA</li>
-<li>ROBERTO ORTEGA</li>
-<li>Roberto Sarmiento</li>
-<li>ROCÍO CHURATA</li>
-<li>ROCÍO QUISPELUQUE</li>
-<li>RODOLFO PARDO</li>
-<li>RODRIGO ASPILCUETA</li>
-<li>RODRIGO CACERES</li>
-<li>RODRIGO RAMOS</li>
-<li>Rodrigo Verano</li>
-<li>ROMINA ZARATE</li>
-<li>RONALD APAZA</li>
-<li>RONALD OBREGÓN</li>
-<li>RUBÉN SULLÓN</li>
-<li>SAMIR MEZA</li>
-<li>SANDRA CORDERO
-<li>SANTIAGO AVENDAÑO</li>
-<li>Sergio Aroni</li>
-<li>SERGIO HINOSTROZA</li>
-<li>SERGIO HUAMÁN</li>
-<li>SERGIO LIZANA</li>
-<li>SERGIO TORRES</li>
-<li>SHEYLA QUISPELUQUE</li>
-<li>SHIRLEY CORDOVA</li>
-<li>SOFÍA TITO</li>
-<li>STEPHANY CÁCERES</li>
-<li>THALÍA VILCA</li>
-<li>VANESSA POMA</li>
-<li>Vanessa Valdiviezo</li>
-<li>VERÓNICA YANA</li>
-<li>VICTOR CABRERA</li>
-<li>VICTOR JIMENEZ</li>
-<li>VICTOR MONTEVERDE</li>
-<li>Victor Piña</li>
-<li>VICTOR ZUMARI</li>
-<li>WALTER FERNANDEZ</li>
-<li>WENDY TORRES</li>
-<li>WILFREDO ZAGRA</li>
-<li>WILMER SANTILLÁN</li>
-<li>XIMENA UMERES</li>
-<li>YESSICA HUALLPA</li>
-<li>YULIANA LAURA</li>
-<li>MARCELO ROBLEDILLO</li>
-<li>JUAN ZAPATA</li>
-<li>JAIME FERNANDEZ</li>
-<li>DIEGO ALCAZAR</li>
-
-<div class="no-results">No se encontraron participantes en esta categoría.</div>
-      </section>
-
-      <section id="participantes-5ta-a" class="panel">
-        <h2>Categorización – 5TA A</h2>
-        <div class="panel-search"><input type="search" class="search" placeholder="Buscar en 5TA A..." aria-label="Buscar en 5TA A"><div class="ac-list" role="listbox"></div></div>
-        <ul class="list">
-<li>YULIANA VILCHEZ</li>
-<li>YULIANA TURPO</li>
-<li>YONY MIRANDA</li>
-<li>YESSICA CCOPA</li>
-<li>YAMILETH QUISPEHUARACA</li>
-<li>XIOMARA HUARCAYA</li>
-<li>WILMER PÉREZ</li>
-<li>WILI JIMENEZ</li>
-<li>VIVIANA MALCA</li>
-<li>VÍCTOR TAPULLIMA</li>
-<li>VICTOR PORTOCARRERO</li>
-<li>VERÓNICA TANTA</li>
-<li>VALERIA APAZA</li>
-<li>TATIANA HUAYHUA</li>
-<li>TANIA CUSI</li>
-<li>SHEYLA CHURA</li>
-<li>SHEYLA CATPO</li>
-<li>SEBASTIAN TRONCOSO</li>
-<li>SEBASTIAN MOREYRA</li>
-<li>SEBASTIÁN HUAYTA</li>
-<li>SANTIAGO LLALLIHUAMAN</li>
-<li>SAMUEL MATOS</li>
-<li>ROSA CHURA</li>
-<li>RONALD CÓRDOVA</li>
-<li>ROMMEL EGÚSQUIZA</li>
-<li>RODRIGO TAPIA</li>
-<li>RODRIGO HERNANDEZ</li>
-<li>ROCÍO LLOCLLA</li>
-<li>ROCÍO CATACORA</li>
-<li>ROBIN SALDAÑA</li>
-<li>ROBERTO PEREDA</li>
-<li>RICARDO QUISPE</li>
-<li>RICARDO MAMANI</li>
-<li>RENZO PUMAHUALA</li>
-<li>RENZO LEVAGGI</li>
-<li>RENZO HUALLPA</li>
-<li>RENATTO GOYCOCHEA</li>
-<li>RENATO MALDONADO</li>
-<li>RAY ZEVALLOS</li>
-<li>RAÚL ZEGARRA</li>
-<li>RAÚL CAMARENA</li>
-<li>RAFAEL CAFFERATA</li>
-<li>PETER GALLARDO</li>
-<li>PEPE LORENZO </li>
-<li>PAULO ARANA</li>
-<li>PAOLA HUARCAYA</li>
-<li>PAMELA TURPO</li>
-<li>PAMELA CATPO</li>
-<li>PABLO HUARACHI</li>
-<li>PABLO CHIRINOS</li>
-<li>OSCAR ROSAS</li>
-<li>OMAR GARCÍA</li>
-<li>OMAR ENCISO </li>
-<li>OLIVER CURAY</li>
-<li>NOELIA CHÁVEZ</li>
-<li>NINO PAULINO</li>
-<li>NICOLE CALLA</li>
-<li>NICOLAS BATALLANOS</li>
-<li>NAYRA TICONA</li>
-<li>NATHALY ARAPA</li>
-<li>NATALIA CONDORI</li>
-<li>NATALIA CALLE</li>
-<li>NAPO LA TORRE</li>
-<li>MIRIAM MAQUERA</li>
-<li>MILAGROS MALCA</li>
-<li>MILAGROS LLANOS</li>
-<li>MILAGROS BLAS</li>
-<li>MIGUEL GUEVARA</li>
-<li>MIGUEL CENTENO</li>
-<li>MELISA MAMANI</li>
-<li>MELINA TICONA</li>
-<li>MAYRA HUAYTA</li>
-<li>MAURO GONZALES</li>
-<li>MAURICIO VILCA</li>
-<li>MAURICIO RODRIGUEZ</li>
-<li>MAURICIO CCOPA</li>
-<li>MATEO SALAS</li>
-<li>MARTIN LUCANO</li>
-<li>MARTÍN ALCÁNTARA</li>
-<li>MARLENE YANA</li>
-<li>MARÍA LAURA</li>
-<li>MARCO TUPAYACHI</li>
-<li>MARCO LOPEZ</li>
-<li>MARCO HUALLPA</li>
-<li>MARCO CARRANZA</li>
-<li>MARCELO RIVERA</li>
-<li>MANUEL RAMÍREZ</li>
-<li>MANUEL ÁVILA</li>
-<li>LUZMILA QUISPE</li>
-<li>LUZ HUAYHUA</li>
-<li>LUIS PALOMINO</li>
-<li>LUIS MORÁN</li>
-<li>LUIS GOMEZ</li>
-<li>LUIS FELIPE</li>
-<li>LUIS EDUARDO HURTADO</li>
-<li>LUIS CASTILLO</li>
-<li>LUCÍA PALOMINO</li>
-<li>LUCERO GUERRA</li>
-<li>LORENA APAZA</li>
-<li>LIZETH QUISPEÑA</li>
-<li>LIZBETH MENESES</li>
-<li>LEONARDO MAGUIÑA</li>
-<li>LEONARDO HUAMAN</li>
-<li>LEANDRO GARCIA</li>
-<li>LAURENT DELMAS</li>
-<li>KLAUS TALAVERANO</li>
-<li>KEVIN YANA</li>
-<li>KEVIN TINEO</li>
-<li>KEVIN SEGURA</li>
-<li>KEVIN ANTUNEZ</li>
-<li>KATHERINE TURPO</li>
-<li>JUNIOR ABANTO</li>
-<li>JULIO POMA</li>
-<li>JULIO HUAYLLANI</li>
-<li>JULIO ALARCON</li>
-<li>JULIO AHON</li>
-<li>JUAN VILLAVERDE</li>
-<li>JUAN MEREL</li>
-<li>JUAN GARCIA</li>
-<li>JUAN CARLOS MELENDEZ</li>
-<li>JUAN CARLOS CARRANZA</li>
-<li>JUAN AREVALO</li>
-<li>JOSHUA PEÑA</li>
-<li>JOSÉ TAQUIRI</li>
-<li>JOSE ROJAS</li>
-<li>JOSÉ RIVERA</li>
-<li>JOSÉ MARTÍN ESPINOZA</li>
-<li>JOSÉ LLAULLI</li>
-<li>JOSÉ LLAQUI</li>
-<li>JOSE ESCRIBA</li>
-<li>JORGE ROSADO</li>
-<li>JORGE PASCO</li>
-<li>JORGE LUIS VILCHEZ</li>
-<li>JORGE HUAYNATE</li>
-<li>JORGE AVELLANEDA</li>
-<li>JORGE ALVA</li>
-<li>JORDY GARCÍA</li>
-<li>JONATHAN GABRIEL</li>
-<li>JOHNY BACA</li>
-<li>JOHN MICCELLI</li>
-<li>JOHAN CABRERA</li>
-<li>JOEL JACOBO</li>
-<li>JOAQUIN MORANTE</li>
-<li>JOAQUÍN LLALLIHUAMAN</li>
-<li>JHOSSELYN CATACORA</li>
-<li>JHONATHAN REVILLA</li>
-<li>JHONATAN VÁSQUEZ</li>
-<li>JESÚS PRADO</li>
-<li>JESUS HUAMAN</li>
-<li>JESÚS DEL CARPIO</li>
-<li>JESÚS CCOPA</li>
-<li>JESUS CARRASCO</li>
-<li>JENNIFER CHAMBILLA</li>
-<li>JAZMÍN PAREDES</li>
-<li>JAVIER CASTRO</li>
-<li>IVAN TORIBIO</li>
-<li>HUGO MELGAR</li>
-<li>HUGO AYARZA</li>
-<li>HISAO HIGUCHI</li>
-<li>HECTOR MARTINEZ</li>
-<li>HÉCTOR LLANQUI</li>
-<li>HÉCTOR LLANQUI</li>
-<li>HARRY MEDINA</li>
-<li>GUSTAVO QUISPEÑA</li>
-<li>GUSTAVO CÓRDOVA</li>
-<li>GUILLERMO SANCHEZ</li>
-<li>GREYSI QUISPEHUAMAN</li>
-<li>GREYSI HUAYHUA</li>
-<li>GONZALO RIVERA </li>
-<li>GONZALO FLORES</li>
-<li>GIANFRANCO UGARELLI</li>
-<li>GIANCARLO SALINAS</li>
-<li>GABRIELA TICONA</li>
-<li>FRANCO QUENTA</li>
-<li>FRANCISCO PÉREZ</li>
-<li>FRANCISCO LLANQUI</li>
-<li>FLAVIA HUARCAYA</li>
-<li>FIORELLA CALLA</li>
-<li>FERNANDO SIERRA</li>
-<li>FERNANDO CATPO</li>
-<li>FAUSTINO AROSTE</li>
-<li>FABRICIO HUAYTA</li>
-<li>FABIO HUAMANÍ</li>
-<li>FABIO CAVASSA</li>
-<li>EVELYN SAENZ</li>
-<li>ESTEFANY CONDOR</li>
-<li>ESTEBAN UGALDE</li>
-<li>ERNESTO SALAZAR</li>
-<li>ERICK CÓRDOVA</li>
-<li>ENZO QUENTA</li>
-<li>ENZO MORALES</li>
-<li>ELVIS SANTILLÁN</li>
-<li>ELENA APAZA</li>
-<li>EDWIN GUEVARA</li>
-<li>EDWARD GAITAN</li>
-<li>EDUARDO TAMAYO</li>
-<li>EDUARDO FLORES MELGAREJO</li>
-<li>EDISON CATACORA</li>
-<li>EDGAR BARRIGA</li>
-<li>EDER PALOMINO</li>
-<li>EDDY CERRILLO</li>
-<li>DIEGO VALDIVIA</li>
-<li>DIEGO QUEZADA</li>
-<li>DIEGO PUMAHUALA</li>
-<li>DIEGO DELGADO</li>
-<li>DIEGO CRUZ</li>
-<li>DIANA COLQUE</li>
-<li>DAYANA MAMANI</li>
-<li>DAVIS ARTEAGA</li>
-<li>DAVID LOPEZ</li>
-<li>DAVID CUSI</li>
-<li>DARWIN HUARCAYA</li>
-<li>DANNY GUERRERO</li>
-<li>DANITZA YANA</li>
-<li>DANITZA SULLCA</li>
-<li>DANIELA QUENTA</li>
-<li>DANIELA LLANQUI</li>
-<li>DANIEL CALMET</li>
-<li>CRISTHIAN APAZA</li>
-<li>COLLEEN GIFFORD</li>
-<li>CLAUDIA HUARCAYA</li>
-<li>CLAUDIA CATIRE</li>
-<li>CHRISTIAN TINOCO</li>
-<li>CHRISTIAN ARELLANO</li>
-<li>CESAR POLO</li>
-<li>CESAR ARCE</li>
-<li>CELIA VILCA</li>
-<li>CECILIA POMA</li>
-<li>CAROLINA TUPAYACHI</li>
-<li>CAROLINA CÓNDOR</li>
-<li>CARLOS VERDEGUER</li>
-<li>CARLOS PAREDES</li>
-<li>CARLOS PAREDES</li>
-<li>CARLOS GERSTEIN</li>
-<li>CARLOS GARCIA</li>
-<li>CARLA PUMA</li>
-<li>CANDY ACERO</li>
-<li>CAMILA VILCA</li>
-<li>BRUNO TITO</li>
-<li>BRUNO AYARZA</li>
-<li>BRISA CUSIHUAMÁN</li>
-<li>ARTURO HUERTAS</li>
-<li>ARMATS GIARNELLY</li>
-<li>ARMANDO VILLENA</li>
-<li>ANTONIO SALAZAR</li>
-<li>ÁNGEL CONDORI</li>
-<li>ANDRÉS QUISPELUQUE</li>
-<li>ANDERSON MENDOZA</li>
-<li>ANAHÍ CUSI</li>
-<li>ANAHÍ CHURA</li>
-<li>ÁLVARO PEÑA</li>
-<li>ÁLVARO CARRASCO</li>
-<li>ALONSO CASTRO</li>
-<li>ALLAN VERÁSTEGUI</li>
-<li>ALFREDO HUAMANI</li>
-<li>ALFREDO ESCALANTE</li>
-<li>ALEXIS TORRES</li>
-<li>ALEXIS HUAYLLANI</li>
-<li>ALEXANDER RODRIGUEZ</li>
-<li>ALEJANDRO VELIT</li>
-<li>ALEJANDRO SAAVEDRA</li>
-<li>ALEJANDRO HUAMANI</li>
-<li>ALEJANDRO HERNANDEZ</li>
-<li>ALEJANDRO BODERO</li>
-<li>ALDO CASTILLO</li>
-<li>ALBERTO TICONA</li>
-<li>ADRIÁN CÓNDOR</li>
-<li>ADRIÁN AYALA</li>
-        <div class="no-results">No se encontraron participantes en esta categoría.</div>
-      </section>
-
-      <section id="participantes-4ta" class="panel">
-        <h2>Categorizacion – 4TA</h2>
-        <div class="panel-search"><input type="search" class="search" placeholder="Buscar en 4TA..." aria-label="Buscar en 4TA"><div class="ac-list" role="listbox"></div></div>
-        <ul class="list">
-  
-        <div class="no-results">No se encontraron participantes en esta categoría.</div>
-      </section>
-    </main>
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-logo-text">
+        <span class="foot-logo-ebook">EBOOK</span>
+        <span class="foot-logo-sub">de Odontología</span>
+      </div>
+      <p class="foot-desc">La biblioteca digital de odontología más completa. Conocimiento especializado para profesionales exigentes.</p>
+      <div class="foot-social">
+      </div>
+    </div>
+    <div>
+      <div class="foot-col-tit">Navegación</div>
+      <ul class="foot-links">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#libros">Catálogo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="foot-col-tit">Contacto</div>
+      <ul class="foot-links">
+        <li><a href="#">💬 WhatsApp</a></li>
+        <li><a href="#">Términos y condiciones</a></li>
+      </ul>
+    </div>
   </div>
+  <div class="foot-copy">© 2026 Ebook de Odontología · Todos los derechos reservados</div>
+</footer>
 
-  <!-- ===== VISTA: MARCAS ===== -->
-  <div id="view-brands" class="view">
-    <main class="container">
-      <section class="brands-grid" aria-label="Listado de marcas">
-        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/Copia-de-Green-and-White-Modern-Bold-Tennis-Course-Sport-Presentation-e1760120335238.png" alt="Marca 1" loading="lazy"></article>
-        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/03/cropped-cropped-WhatsApp-Image-2025-02-28-at-2.31.55-PM-1-1-300x230.jpeg" alt="Marca 2" loading="lazy"></article>
-        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/image.jpg" alt="Marca 3" loading="lazy"></article>
-        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/Copia-de-Green-and-White-Modern-Bold-Tennis-Course-Sport-Presentation-3-e1759974902519.jpg" alt="Marca 4" loading="lazy"></article>
-        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-07-at-5.51.44-PM-1-e1759974958255.jpeg " alt="Marca 5" loading="lazy"></article>
-        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-10-at-2.26.44-PM-e1760127863120.jpeg " alt="Marca 6" loading="lazy"></article>
-        <article class="brand-card"><img src="https://confraternidadentreraquetas.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-10-at-2.26.44-PM-1-e1760127823791.jpeg" alt="Marca 7" loading="lazy"></article>
-    </main>
-  </div>
-  <script>
-  /* Fondo del HERO desde data-bg */
-  (function(){
-    const hero = document.getElementById('hero');
-    const bgUrl = hero?.getAttribute('data-bg');
-    if(bgUrl){ document.documentElement.style.setProperty('--hero-photo', `url('${bgUrl}')`); }
-  })();
-
-  /* Menú móvil */
-  const burger = document.getElementById('burger');
-  const menu = document.getElementById('mainmenu');
-  burger.addEventListener('click', () => {
-    const open = menu.classList.toggle('show');
-    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>{ menu.classList.remove('show'); burger.setAttribute('aria-expanded','false'); }));
-
-  /* Router por hash */
-  const viewHome   = document.getElementById('view-home');
-  const viewPart   = document.getElementById('view-part');
-  const viewBrands = document.getElementById('view-brands');
-  const panels = Array.from(document.querySelectorAll('.panel'));
-
-  function showView(target){
-    [viewHome, viewPart, viewBrands].forEach(v => v.classList.remove('active'));
-    target.classList.add('active');
-    window.scrollTo({top:0, behavior:'instant'});
-  }
-  function route(){
-    const h = location.hash || '#inicio';
-    if (h === '#marcas'){ showView(viewBrands); return; }
-    if (h.startsWith('#participantes-')){
-      showView(viewPart);
-      panels.forEach(p => p.classList.toggle('active', ('#'+p.id)===h));
-      document.querySelector(h)?.scrollIntoView({behavior:'smooth',block:'start'});
-      return;
-    }
-    showView(viewHome);
-    if (h==='#quienes-somos' || h==='#categorizacion'){
-      document.querySelector(h)?.scrollIntoView({behavior:'smooth',block:'start'});
-    }
-  }
-  window.addEventListener('hashchange', route);
-  document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click', ()=>setTimeout(route,0)));
-  route();
-
-  /* Animaciones de entrada globales (reveal simple) */
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){ e.target.classList.add('shown'); io.unobserve(e.target); }
-    });
-  },{threshold:.14});
-  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-
-  /* Buscador con autocompletar por categoría */
-  const norm=t=>(t||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-  const tokens=name=>norm(name).split(/\s+/).filter(Boolean);
-  function setupCategorySearch(panel){
-    const input=panel.querySelector('.search'); const list=panel.querySelector('.list'); const empty=panel.querySelector('.no-results'); const acBox=panel.querySelector('.ac-list');
-    if(!input||!list)return;
-    const getItems=()=>Array.from(list.querySelectorAll('li')).map(li=>({el:li,name:li.textContent.trim()}));
-    function renderAC(sugs){ if(!sugs.length){acBox.classList.remove('show');acBox.innerHTML='';return;} acBox.innerHTML=sugs.slice(0,10).map(s=>`<div class="ac-item" role="option" data-name="${s.name.replace(/"/g,'&quot;')}">${s.name}</div>`).join(''); acBox.classList.add('show'); }
-    function applyFilter(q,items){ let vis=0; const nq=norm(q); items.forEach(({el,name})=>{ const show=!nq||norm(name).includes(nq); el.style.display=show?'':'none'; if(show)vis++;}); if(empty) empty.style.display=(vis===0)?'block':'none'; }
-    function suggest(q,items){ const nq=norm(q); if(!nq) return []; return items.filter(({name})=> tokens(name).some(tok=>tok.startsWith(nq)) ); }
-    input.addEventListener('input',()=>{ const items=getItems(); const q=input.value; applyFilter(q,items); renderAC(suggest(q,items)); });
-    acBox.addEventListener('click',(e)=>{ const it=e.target.closest('.ac-item'); if(!it)return; const name=it.dataset.name; input.value=name; const items=getItems(); applyFilter(name,items); acBox.classList.remove('show'); items.find(x=>x.name===name)?.el?.scrollIntoView({behavior:'smooth',block:'center'}); });
-    document.addEventListener('click',(e)=>{ if(!panel.contains(e.target) && acBox.classList.contains('show')) acBox.classList.remove('show'); });
-  }
-  document.querySelectorAll('.panel').forEach(setupCategorySearch);
-</script>
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
 <script>
+/* ==============================================================
+   DATOS DE LIBROS
+   ==============================================================
+   CÓMO AGREGAR TUS IMÁGENES DE TABLET:
+   1. Sube tu imagen a un servicio gratuito como:
+      - https://imgbb.com  (recomendado)
+      - https://imgur.com
+      - O cualquier hosting de imágenes
+   2. Copia el enlace DIRECTO de la imagen (debe terminar en
+      .jpg, .png, .webp, etc.)
+   3. Pégalo en el campo imagen:"" del libro correspondiente
+
+   EJEMPLO:
+   imagen: "https://i.ibb.co/AbCdEf/mi-libro.jpg"
+
+   CÓMO AGREGAR UN LIBRO NUEVO:
+   Copia este bloque y pégalo antes del ];
+   { nombre:"Título del libro", paginas:000, idioma:"Español",
+     anio:2024, imagen:"", categoria:"Especialidad" },
+
+   CATEGORÍAS DISPONIBLES:
+   , , Periodoncia, Implantología,
+   Operatoria, Cirugía, Anatomía, Radiología, Prostodoncia,
+   Patología, Farmacología, Estética
+   ============================================================== */
+const LIBROS = [
+  /* ──  ──────────────────────────────── */
+  
+  { nombre:"Abordajes Mínimamente Invasivos en la Práctica Endodóncica", paginas:233, idioma:"Español", anio:2026, imagen:"img/1.png", categoria:"Endodoncia" },
+  { nombre:"Aumento óseo en implantología dental", paginas:273, idioma:"Español", anio:2026, imagen:"img/2.png", categoria:"Implantología" },
+  { nombre:"Anatomía clínica para implantología oral", paginas:312, idioma:"Español", anio:2026, imagen:"img/3.png", categoria:"Implantología" },
+  { nombre:"Arte y ciencia de la odontología operatoria", paginas:673, idioma:"Español", anio:2025, imagen:"img/4.png", categoria:"Odontología General" },
+  { nombre:"Avances en implantología dental mediante nanomateriales y aplicaciones de tecnologías afines.", paginas:404, idioma:"Español", anio:2025, imagen:"img/5.png", categoria:"Implantología" },
+  { nombre:"Complicaciones en cirugía craneomaxilofacial y oral", paginas:307, idioma:"Español", anio:2026, imagen:"img/6.png", categoria:"Cirugia Oral" },
+  { nombre:"Cirugía láser avanzada en odontología", paginas:243, idioma:"Español", anio:2026, imagen:"img/7.png", categoria:"Cirugia Oral" },
+  { nombre:"Atención Dental para niños con Necesidades Especiales", paginas:294, idioma:"Español", anio:2026, imagen:"img/8.png", categoria:"Odontopediatria" },
+  { nombre:"Atlas de Anatomía Oral y Maxilofacial", paginas:170, idioma:"Español", anio:2026, imagen:"img/9.png", categoria:"Anatomia" },
+  { nombre:"Atlas de carga Inmediata de Implantes Dentales", paginas:402, idioma:"Español", anio:2026, imagen:"img/10.png",categoria:"Implantología"},
+  { nombre:"Avances en la estética dental implantología", paginas:501, idioma:"Español", anio:2026, imagen:"img/11.png", categoria:"Operatoria y Estetica dental" },
+  { nombre:"Cirugía Oral Basada en Evidencia", paginas:593, idioma:"Español", anio:2026, imagen:"img/12.png",categoria:"Cirugia Oral" },
+  { nombre:"Complicaciones en Implantes Dentales", paginas:310, idioma:"Español", anio:2026, imagen:"img/13.png",categoria:"Implantología" },
+  { nombre:"Implantología Basal", paginas:496, idioma:"Español", anio:2026, imagen:"img/14.png",categoria:"Implantología" },
+  { nombre:"Manejo Oseo en Implantología Dental", paginas:295, idioma:"Español", anio:2026, imagen:"img/15.png",categoria:"Implantología" },
+  { nombre:"Odontología Estética Funcional", paginas:361, idioma:"Español", anio:2026, imagen:"img/16.png",categoria:"Operatoria y Estetica dental" },
+  { nombre:"Ortodoncia esencial", paginas:304, idioma:"Español", anio:2026, imagen:"img/17.png",categoria:"Ortodoncia" },
+  { nombre:"Ortodoncia para adultos", paginas:594, idioma:"Español", anio:2026, imagen:"img/18.png",categoria:"Ortodoncia" },
+  { nombre:"Ultrasonido Dental en Periodoncia e Implantología", paginas:256, idioma:"Español", anio:2026, imagen:"img/19.png",categoria:"Periodoncia" },
+  { nombre:"Adhesión, Remineralización, Estética y Biomimética", paginas:600, idioma:"Español", anio:2024, imagen:"img/20.png",categoria:"Operatoria y Estetica dental" },
+  { nombre:"Abordaje Clínico Integral de Mínima Intervención de la Lesión de Caries Dental", paginas:400, idioma:"Español", anio:2023, imagen:"img/21.png",categoria:"Operatoria y Estetica dental" },
+  { nombre:"Anatomía Dental", paginas:400, idioma:"Español", anio:2023, imagen:"img/22.png",categoria:"Anatomia" },
+  { nombre:"Anteriores. Dientes Anteriores Naturalmente Hermosos", paginas:700, idioma:"Español", anio:2023, imagen:"img/23.png",categoria:"Operatoria y Estetica dental" },
+  { nombre:"Aparatos de Ortodoncia Fijos Edgewise Preajustados", paginas:520, idioma:"Español", anio:2024, imagen:"img/24.png",categoria:"Ortodoncia" },
+  { nombre:"Atlas de Cirugía Oral y Maxilofacial", paginas:1100, idioma:"Español", anio:2024, imagen:"img/25.png",categoria:"Cirugia Oral" },
+  { nombre:"Avances en Cirugía Periodontal", paginas:300, idioma:"Español", anio:2024, imagen:"img/26.png",categoria:"Periodoncia" },
+  { nombre:"Manejo Clínico de la Reabsorción Radicular en Ortodoncia ", paginas:200, idioma:"Español", anio:2025, imagen:"img/27.png",categoria:"Ortodoncia" },
+  { nombre:"Manejo Contemporáneo de los Trastornos Temporomandibulares", paginas:300, idioma:"Español", anio:2024, imagen:"img/28.png", categoria:"Oclusión" },
+  { nombre:"Implantes en la Zona Estética", paginas:380, idioma:"Español", anio:2023, imagen:"img/29.png", categoria:"Implantología"},
+  { nombre:"Los Mejores Aparatos Ortopédicos Funcionales", paginas:650, idioma:"Español", anio:2023, imagen:"img/30.png", categoria:"Ortodoncia" },
+  { nombre:"MISCH Implantología Contemporánea", paginas:1300, idioma:"Español", anio:2023, imagen:"img/31.png", categoria:"Implantología" },
+  { nombre:"Odontología Estética", paginas:1700, idioma:"Español", anio:2023, imagen:"img/32.png", categoria:"Operatoria y Estetica dental" },
+  { nombre:"Microcirugía Plástica Periodontal y Periimplantaria", paginas:400, idioma:"Español", anio:2023, imagen:"img/33.png", categoria:"Implantología" },
+  { nombre:"Microcirugía en Endodoncia", paginas:290, idioma:"Español", anio:2023, imagen:"img/34.png", categoria:"Endodoncia" },
+  { nombre:"Mecanismos Biológicos del Movimiento Dental", paginas:400, idioma:"Español", anio:2023, imagen:"img/35.png", categoria:"Ortodoncia" },
+  { nombre:"Odontología para el Niño y el Adolescente", paginas:820, idioma:"Español", anio:2024, imagen:"img/36.png", categoria:"Odontopediatria" },
+  { nombre:"Periodontología Clínica Esencial", paginas:210, idioma:"Español", anio:2024, imagen:"img/37.png", categoria:"Periodoncia" },
+  { nombre:"Periodoncia Clínica e Implantología de Lindhe", paginas:1400, idioma:"Español", anio:2022, imagen:"img/38.png", categoria:"Periodoncia" },
+  { nombre:"Ortopedia Funcional de los Maxilares en Odontopediatría", paginas:620, idioma:"Español", anio:2024, imagen:"img/39.png", categoria:"Ortodoncia" },
+  { nombre:"Ortodoncia en Pacientes con Apnea Obstructiva del Sueño", paginas:200, idioma:"Español", anio:2024, imagen:"img/40.png", categoria:"Ortodoncia" },
+  { nombre:"Restauración del Espacio Intrarradicular Sistemas de Postes Estéticos", paginas:300, idioma:"Español", anio:2022, imagen:"img/41.png", categoria:"Operatoria y Estetica dental" },
+  { nombre:"Odontopediatría Restauradora", paginas:320, idioma:"Español", anio:2023, imagen:"img/42.png", categoria:"Odontopediatria" },
+  { nombre:"Prótesis Fija Contemporánea", paginas:1100, idioma:"Español", anio:2023, imagen:"img/43.png", categoria:"Reahbilitacion Oral" },
+  { nombre:"Prótesis Dental sobre Implantes", paginas:300, idioma:"Español", anio:2023, imagen:"img/44.png", categoria:"Reahbilitacion Oral" },
+  { nombre:"Prótesis Dental Completa", paginas:420, idioma:"Español", anio:2024, imagen:"img/45.png", categoria:"Reahbilitacion Oral" },
+  { nombre:"Principios y Biomecánica del Tratamiento con Alineadores", paginas:340, idioma:"Español", anio:2023, imagen:"img/46.png", categoria:"Ortodoncia" },
+  { nombre:"Principios de Extracciones Dentoalveolares", paginas:170, idioma:"Español", anio:2024, imagen:"img/47.png", categoria:"Cirugia Oral" },
+  { nombre:"Técnicas de Tratamiento Contemporáneas en Odontopediatría", paginas:300, idioma:"Español", anio:2023, imagen:"img/48.png", categoria:"Odontopediatria" },
+  { nombre:"Técnicas de alineadores en Ortodoncia", paginas:600, idioma:"Español", anio:2024, imagen:"img/49.png", categoria:"Ortodoncia" },
+  { nombre:"Técnica de alineadores transparentes", paginas:400, idioma:"Español", anio:2023, imagen:"img/50.png", categoria:"Ortodoncia" },
+  { nombre:"Restauraciones Extracoronales", paginas:520, idioma:"Español", anio:2023, imagen:"img/51.png", categoria:"Operatoria y Estetica dental" },
+  { nombre:"Restauraciones indirectas", paginas:800, idioma:"Español", anio:2023, imagen:"img/52.png", categoria:"Operatoria y Estetica dental" },
+  { nombre:"Restauraciones Directas Posteriores", paginas:1500, idioma:"Español", anio:2024, imagen:"img/53.png", categoria:"Operatoria y Estetica dental" },
+  { nombre:"Tratamiento de Ortodoncia de dientes impactados", paginas:850, idioma:"Español", anio:2022, imagen:"img/54.png", categoria:"Ortodoncia" },
+  { nombre:"Tratamiento de OCLUSION y AFECCIONES TEMPOROMANDIBULARES", paginas:550, idioma:"Español", anio:2023, imagen:"img/55.png", categoria:"Oclusión" },
+  { nombre:"Tratamiento con Alineadores de Ortodoncia", paginas:260, idioma:"Español", anio:2024, imagen:"img/56.png", categoria:"Ortodoncia" },
+  { nombre:"Trastornos de la Articulación Temporomandibular", paginas:400, idioma:"Español", anio:2023, imagen:"img/57.png", categoria:"Oclusión" },
+  { nombre:"Técnicas para el Éxito con Implantes en la Zona Estética", paginas:340, idioma:"Español", anio:2022, imagen:"img/58.png", categoria:"Implantología" },
+  { nombre:"Tratado de Ortodoncia", paginas:550, idioma:"Español", anio:2024, imagen:"img/59.png", categoria:"Ortodoncia" },
+  { nombre:"Cirugía Oral y Maxilofacial. Atlas de Procedimientos y Técnicas Quirúrgicas", paginas:1200, idioma:"Español", anio:2023, imagen:"img/60.png", categoria:"Cirugia Oral" },
+  { nombre:"Casos Clínicos en Tratamiento de Ortodoncia Temprana", paginas:580, idioma:"Español", anio:2024, imagen:"img/61.png", categoria:"Ortodoncia" },
+  { nombre:"Cefalometría en Ortodoncia 2D y 3D", paginas:245, idioma:"Español", anio:2023, imagen:"img/62.png", categoria:"Ortodoncia" },
+  { nombre:"Cirugía Guiada en Implantología", paginas:150, idioma:"Español", anio:2024, imagen:"img/63.png", categoria:"Implantología"},
+  { nombre:"Carillas Lentes de Contacto y Fragmentos Cerámicos.", paginas:700, idioma:"Español", anio:2023, imagen:"img/64.png", categoria:"Operatoria y Estetica dental" },
+  { nombre:"Casos Clínicos en el Tratamiento Ortodóntico Temprano", paginas:370, idioma:"Español", anio:2023, imagen:"img/65.png", categoria:"Ortodoncia" },
+  { nombre:"Cirugía Oral y Maxilofacial Contemporánea", paginas:800, idioma:"Español", anio:2024, imagen:"img/66.png", categoria:"Cirugia Oral" },
+  { nombre:"Cohen Vías de la Pulpa", paginas:3500, idioma:"Español", anio:2023, imagen:"img/67.png", categoria:"Endodoncia" },
+  { nombre:"Cirugía Periodontal Avanzada", paginas:270, idioma:"Español", anio:2022, imagen:"img/68.png", categoria:"Periodoncia" },
+  { nombre:"Cirugía Oral y Maxilofacial para el Paciente Médicamente Comprometido Una guía para el manejo y la atención de alta calidad", paginas:150, idioma:"Español", anio:2022, imagen:"img/69.png", categoria:"Cirugia Oral" },
+  { nombre:"Donado. Cirugía bucal", paginas:1350, idioma:"Español", anio:2023, imagen:"img/70.png", categoria:"Cirugia Oral" },
+  { nombre:"Dispositivos de Anclaje Temporal en Ortodoncia ", paginas:400, idioma:"Español", anio:2023, imagen:"img/71.png", categoria:"Ortodoncia" },
+  { nombre:"Diagnóstico Biofuncional", paginas:550, idioma:"Español", anio:2023, imagen:"img/72.png", categoria:"Ortodoncia" },
+  { nombre:"Diagnóstico y Tratamiento de las Patologías de la Articulación Temporomandibular", paginas:350, idioma:"Español", anio:2023, imagen:"img/73.png", categoria:"Oclusión" },
+  { nombre:"Edodoncia esencial prevención y tratamiento de la periodontitis apical", paginas:440, idioma:"Español", anio:2022, imagen:"img/74.png", categoria:"Endodoncia" },
+  { nombre:"El implante de un diente", paginas:350, idioma:"Español", anio:2023, imagen:"img/75.png", categoria:"Implantología" },
+  { nombre:"Endodoncia Técnicas Clínicas y Bases Científicas", paginas:1500, idioma:"Español", anio:2023, imagen:"img/76.png", categoria:"Endodoncia" },
+  { nombre:"Endodoncia Microquirúrgica", paginas:650, idioma:"Español", anio:2023, imagen:"img/77.png", categoria:"Endodoncia" },
+  { nombre:"Endodoncia Principios y Práctica", paginas:600, idioma:"Español", anio:2023, imagen:"img/78.png", categoria:"Endodoncia" },
+  { nombre:"Endodoncia Contemporánea para Niños y Adolescentes", paginas:450, idioma:"Español", anio:2024, imagen:"img/79.png", categoria:"Endodoncia" },
+  { nombre:"Estética Dentofacial", paginas:450, idioma:"Español", anio:2024, imagen:"img/80.png", categoria:"Operatoria y Estetica dental" },
+  { nombre:"Procedimientos quirúrgicos maxilofaciales", paginas:468, idioma:"Español", anio:2026, imagen:"img/81.png", categoria:"Cirugia Oral" },
+  { nombre:"Anatomía del conducto radicular en la dentición permanente", paginas:530, idioma:"Español", anio:2026, imagen:"img/82.png", categoria:"Endodoncia" },
+  { nombre:"Traumatismos maxilofaciales pediátricos", paginas:251, idioma:"Español", anio:2026, imagen:"img/83.png", categoria:"Odontopediatria" },
+  { nombre:"Evidencia Ortodoncica", paginas:275, idioma:"Español", anio:2026, imagen:"img/84.png", categoria:"Ortodoncia" },
+  { nombre:"Técnicas de imagen en radiología dental", paginas:297, idioma:"Español", anio:2026, imagen:"img/85.png", categoria:"Radiología" },
+  { nombre:"Terapia de extracción parcial en implantología dental", paginas:515, idioma:"Español", anio:2026, imagen:"img/86.png", categoria:"Implantología" },
+  { nombre:"Resonancia magnética de la articulación temporomandibular", paginas:346, idioma:"Español", anio:2026, imagen:"img/87.png", categoria:"Oclusión" },
+  { nombre:"Rehabilitación oral para adultos mayores", paginas:302, idioma:"Español", anio:2026, imagen:"img/88.png", categoria:"Reahbilitacion Oral" },
+  { nombre:"Guía de Soluciones en Tratamiento Periodontal", paginas:320, idioma:"Español", anio:2024, imagen:"img/89.png", categoria:"Periodoncia" },
+  { nombre:"Imágenes de la Articulación Temporomandibular", paginas:440, idioma:"Español", anio:2023, imagen:"img/90.png", categoria:"Oclusión" },
+  { nombre:"Odontología Restauradora Integral", paginas:390, idioma:"Español", anio:2023, imagen:"img/91.png", categoria:"Operatoria y Estetica dental" },
+  { nombre:"Imágenes en la Práctica Odontológica Pediátrica", paginas:260, idioma:"Español", anio:2024, imagen:"img/92.png", categoria:"Odontopediatria" },
+  { nombre:"Manual de Cirugia Oral", paginas:900, idioma:"Español", anio:2022, imagen:"img/93.png", categoria:"Cirugia Oral" },
+  { nombre:"Marpe Expandiendo los Limites de la Ortodoncia ", paginas:500, idioma:"Español", anio:2022, imagen:"img/94.png", categoria:"Ortodoncia" },
+  { nombre:"Manual de Urgencias en Cirugía Oral y Maxilofacial", paginas:300, idioma:"Español", anio:2023, imagen:"img/95.png", categoria:"Cirugia Oral" },
+  { nombre:"Prótesis de implantes mandibulares", paginas:305, idioma:"Español", anio:2026, imagen:"img/96.png", categoria:"Reahbilitacion Oral" },
+];
+
+const EMOJIS = {
+  "":"🦷","":"📐","Periodoncia":"🔬","Operatoria":"⚙️",
+  "Cirugía":"🩺","Implantología":"🔩","Anatomía":"💀","Patología":"🔭",
+  "Farmacología":"💊","Radiología":"🩻","Prostodoncia":"🦿","Estética":"✨","default":"📖"
+};
+const ANIOS = [2026,2025,2024,2023,2022];
+
+/* Función genérica para crear botones de categoría (sidebar y drawer) */
+function crearCatBtns(contenedorId, claseBtn, onclickFn) {
+  const cats = {};
+  LIBROS.forEach(l => { cats[l.categoria] = (cats[l.categoria]||0)+1; });
+  const c = document.getElementById(contenedorId);
+  let h = `<button class="${claseBtn} act" onclick="${onclickFn}('todos',this)"><span>Todas</span><span class="cat-count">${LIBROS.length}</span></button>`;
+  if (claseBtn==='cat-btn') h += `<div class="sidebar-sep"></div>`;
+  Object.keys(cats).sort().forEach(cat => {
+    h += `<button class="${claseBtn}" onclick="${onclickFn}('${cat}',this)"><span>${cat}</span><span class="cat-count">${cats[cat]}</span></button>`;
+  });
+  c.insertAdjacentHTML('beforeend', h);
+}
+
+function crearAnioBtns(contenedorId, claseBtn, onclickFn) {
+  const c = document.getElementById(contenedorId);
+  let h = `<button class="${claseBtn} act" onclick="${onclickFn}('todos',this)">Todos los años</button>`;
+  ANIOS.forEach(a => {
+    const n = LIBROS.filter(l=>l.anio===a).length;
+    if (n>0) h += `<button class="${claseBtn}" onclick="${onclickFn}(${a},this)">${a} <span style="opacity:.45;font-size:11px">(${n})</span></button>`;
+  });
+  c.innerHTML = h;
+}
+
+/* Build sidebar desktop */
+function buildSidebar() {
+  crearCatBtns('sidebarCats', 'cat-btn', 'filtrarCat');
+  crearAnioBtns('sidebarAnios', 'anio-btn', 'filtrarAnio');
+}
+
+/* Build drawer móvil */
+function buildDrawer() {
+  crearCatBtns('drawerCats', 'drawer-cat-btn', 'filtrarCat');
+  crearAnioBtns('drawerAnios', 'drawer-anio-btn', 'filtrarAnio');
+}
+
+/* ==============================================================
+   CARRUSEL — motor JS puro (sin animación CSS)
+   • Scroll automático suave con requestAnimationFrame
+   • Swipe táctil y arrastre con mouse sin lag
+   • Loop infinito real por clonación
+   ============================================================== */
+function buildCarrusel() {
+  const wrap  = document.getElementById('carruselWrap');
+  const track = document.getElementById('carruselTrack');
+
+  const subset = LIBROS.slice(0, 24);
+  const items  = [...subset, ...subset];
+  track.innerHTML = items.map(l => {
+    const em  = EMOJIS[l.categoria] || EMOJIS.default;
+    const img = l.imagen
+      ? `<img data-src="${l.imagen}" src="" alt="${l.nombre}" class="car-lazy"
+             style="opacity:0;transition:opacity .3s;width:100%;height:100%;object-fit:cover">`
+      : '';
+    return `<div class="car-card">
+      <div class="car-portada">
+        ${img}
+        <div class="car-portada-ph" style="${l.imagen ? 'display:none' : ''}">${em}</div>
+      </div>
+      <div class="car-info">
+        <div class="car-nombre">${l.nombre}</div>
+        <div class="car-meta">${l.categoria} · ${l.anio}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const carIO = new IntersectionObserver((entries, obs) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const img = e.target;
+      if (img.dataset.src) {
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+        img.onload  = () => { img.style.opacity = 1; };
+        img.onerror = () => {
+          img.style.display = 'none';
+          const ph = img.nextElementSibling;
+          if (ph) ph.style.display = 'flex';
+        };
+      }
+      obs.unobserve(img);
+    });
+  }, { root: wrap, rootMargin: '300px' });
+  track.querySelectorAll('.car-lazy').forEach(img => carIO.observe(img));
+
+  /* 2. Estado del carrusel */
+  const SPEED   = 0.6;   // px por frame en auto-scroll (ajusta velocidad)
+  let pos       = 0;     // posición actual en px
+  let halfW     = 0;     // ancho de la mitad del track (un loop completo)
+  let dragging  = false;
+  let dragStartX = 0;
+  let dragLastX  = 0;
+  let dragVel    = 0;    // velocidad del dedo
+  let autoActive = true; // ¿scroll automático activo?
+  let rafId      = null;
+
+  function getHalfW() {
+    return track.scrollWidth / 2;
+  }
+
+  /* 3. Loop de animación */
+  function tick() {
+    halfW = getHalfW();
+
+    if (!dragging && autoActive) {
+      pos += SPEED;
+    }
+
+    /* Loop infinito: cuando llegamos a la mitad, volvemos al inicio */
+    if (pos >= halfW) pos -= halfW;
+    if (pos < 0)      pos += halfW;
+
+    track.style.transform = `translateX(${-pos}px)`;
+    rafId = requestAnimationFrame(tick);
+  }
+
+  /* 4. Eventos táctiles (dedo) */
+  wrap.addEventListener('touchstart', e => {
+    dragging   = true;
+    dragStartX = e.touches[0].clientX;
+    dragLastX  = dragStartX;
+    dragVel    = 0;
+    wrap.classList.add('grabbing');
+  }, { passive: true });
+
+  wrap.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    const x  = e.touches[0].clientX;
+    const dx = dragLastX - x;   // positivo = mover hacia la izquierda
+    dragVel  = dx;
+    pos     += dx;
+    dragLastX = x;
+  }, { passive: true });
+
+  wrap.addEventListener('touchend', () => {
+    dragging = false;
+    wrap.classList.remove('grabbing');
+    /* Inercia suave al soltar */
+    applyInertia(dragVel);
+  }, { passive: true });
+
+  wrap.addEventListener('touchcancel', () => {
+    dragging = false;
+    wrap.classList.remove('grabbing');
+  }, { passive: true });
+
+  /* 5. Eventos de mouse (desktop) */
+  wrap.addEventListener('mousedown', e => {
+    e.preventDefault();
+    dragging   = true;
+    dragStartX = e.clientX;
+    dragLastX  = e.clientX;
+    dragVel    = 0;
+    wrap.classList.add('grabbing');
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx = dragLastX - e.clientX;
+    dragVel  = dx;
+    pos     += dx;
+    dragLastX = e.clientX;
+  });
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    wrap.classList.remove('grabbing');
+    applyInertia(dragVel);
+  });
+
+  /* 6. Pausa al hacer hover con mouse en desktop */
+  wrap.addEventListener('mouseenter', () => { if (!dragging) autoActive = false; });
+  wrap.addEventListener('mouseleave', () => { autoActive = true; });
+
+  /* 7. Inercia: deceleración suave después de soltar */
+  function applyInertia(vel) {
+    let v = vel;
+    function step() {
+      if (Math.abs(v) < 0.3) { autoActive = true; return; }
+      pos += v;
+      v   *= 0.88;
+      requestAnimationFrame(step);
+    }
+    autoActive = false;
+    step();
+    /* Reactiva auto-scroll después de 1.2s si el usuario no toca nada */
+    setTimeout(() => { autoActive = true; }, 1200);
+  }
+
+  /* 8. Arranca el loop */
+  rafId = requestAnimationFrame(tick);
+}
+
+/* ── Lazy loading catálogo ── */
+const _libIO = new IntersectionObserver((entries, obs) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const card = e.target;
+    const img  = card.querySelector('img[data-src]');
+    if (img) {
+      img.src = img.dataset.src;
+      img.removeAttribute('data-src');
+      img.onload  = () => { img.style.opacity = 1; };
+      img.onerror = () => {
+        img.style.display = 'none';
+        const ph = card.querySelector('.lib-ph');
+        if (ph) ph.style.display = 'flex';
+      };
+    }
+    obs.unobserve(card);
+  });
+}, { rootMargin: '400px' });
+
+/* Render libros */
+function renderLibros(lista) {
+  const grid = document.getElementById('librosGrid');
+  document.getElementById('libCnt').innerHTML = `Mostrando <strong>${lista.length}</strong> resultado${lista.length!==1?'s':''}`;
+  if (!lista.length) {
+    grid.innerHTML = `<div class="sin-res"><div class="sin-res-icon">🔍</div><p>No se encontraron libros con ese criterio.</p></div>`;
+    return;
+  }
+  grid.innerHTML = lista.map(libro => {
+    const idx = LIBROS.indexOf(libro);
+    const em  = EMOJIS[libro.categoria] || EMOJIS.default;
+    const portada = libro.imagen
+      ? `<img data-src="${libro.imagen}" src="" alt="${libro.nombre}"
+             style="opacity:0;transition:opacity .35s;width:100%;height:100%;object-fit:cover">`
+      : '';
+    return `<div class="libro-card" onclick="abrirModal(${idx})">
+      <div class="libro-portada">
+        ${portada}
+        <div class="lib-ph" style="${libro.imagen ? 'display:none' : ''}">${em}</div>
+        <span class="id-badge">${libro.idioma}</span>
+        <span class="anio-badge">${libro.anio}</span>
+      </div>
+      <div class="libro-body">
+        <div class="libro-nombre">${libro.nombre}</div>
+        <div class="libro-meta">
+          <span class="meta-tag">📄 ${libro.paginas} pág</span>
+          <span class="meta-tag">🎓 ${libro.categoria}</span>
+        </div>
+        <button class="btn-ficha" onclick="event.stopPropagation();abrirModal(${idx})">📋 Ver Ficha Técnica</button>
+      </div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.libro-card').forEach(c => _libIO.observe(c));
+}
+
+/* Filtros */
+let catActual = 'todos', anioActual = 'todos';
+
+function filtrarCat(cat, btn) {
+  catActual = cat;
+  /* Sincroniza ambos (sidebar + drawer) */
+  document.querySelectorAll('.cat-btn, .drawer-cat-btn').forEach(b => b.classList.remove('act'));
+  btn.classList.add('act');
+  /* Sincronizar el otro panel también */
+  const todos = document.querySelectorAll(`.cat-btn, .drawer-cat-btn`);
+  todos.forEach(b => { if(b!==btn && b.querySelector('span')?.textContent===(btn.querySelector('span')?.textContent||btn.textContent.trim())) b.classList.add('act'); });
+  aplicarFiltros();
+}
+
+function filtrarAnio(a, btn) {
+  anioActual = a;
+  document.querySelectorAll('.anio-btn, .drawer-anio-btn').forEach(b => b.classList.remove('act'));
+  btn.classList.add('act');
+  aplicarFiltros();
+}
+
+function aplicarFiltros() {
+  const txt = document.getElementById('buscador').value.toLowerCase().trim();
+  let res = LIBROS;
+  if (catActual !== 'todos') res = res.filter(l => l.categoria === catActual);
+  if (anioActual !== 'todos') res = res.filter(l => l.anio === anioActual);
+  if (txt) res = res.filter(l => l.nombre.toLowerCase().includes(txt));
+  renderLibros(res);
+}
+
+/* Modal */
+function abrirModal(idx) {
+  const l = LIBROS[idx];
+  const imgEl = document.getElementById('ipadEmoji');
+  const phEl  = document.getElementById('ipadPh');
+  if (l.imagen) {
+    imgEl.src = l.imagen;
+    imgEl.alt = l.nombre;
+    imgEl.style.display = 'block';
+    if (phEl) phEl.style.display = 'none';
+  } else {
+    imgEl.style.display = 'none';
+    if (phEl) phEl.style.display = 'block';
+  }
+  document.getElementById('mCat').textContent = l.categoria;
+  document.getElementById('mTitulo').textContent = l.nombre;
+  document.getElementById('mDetalles').innerHTML = `
+    <div class="det-item"><div class="det-label">📄 Páginas</div><div class="det-valor">${l.paginas} páginas</div></div>
+    <div class="det-item"><div class="det-label">🌐 Idioma</div><div class="det-valor">${l.idioma}</div></div>
+    <div class="det-item"><div class="det-label">📅 Año</div><div class="det-valor">${l.anio}</div></div>
+    <div class="det-item"><div class="det-label">📦 Formato</div><div class="det-valor">Ebook PDF</div></div>`;
+  document.getElementById('btnConsultar').dataset.libro = l.nombre;
+  document.getElementById('btnConsultar').dataset.imagen = l.imagen || '';
+  document.getElementById('modal').classList.add('abierto');
+  document.body.style.overflow = 'hidden';
+}
+function cerrarModal() {
+  document.getElementById('modal').classList.remove('abierto');
+  document.body.style.overflow = '';
+}
+function cerrarFuera(e) { if(e.target===document.getElementById('modal')) cerrarModal(); }
+document.addEventListener('keydown', e => { if(e.key==='Escape') { cerrarModal(); closeMenu(); cerrarDrawer(); } });
+
+/* Drawer móvil */
+function abrirDrawer() {
+  document.getElementById('drawer').classList.add('vis');
+  document.getElementById('drawerOverlay').classList.add('vis');
+  document.body.style.overflow = 'hidden';
+}
+function cerrarDrawer() {
+  document.getElementById('drawer').classList.remove('vis');
+  document.getElementById('drawerOverlay').classList.remove('vis');
+  document.body.style.overflow = '';
+}
+
+/* Menú móvil */
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const overlay = document.getElementById('mmOverlay');
+  const btn = document.getElementById('hamburger');
+  const isOpen = menu.classList.toggle('vis');
+  overlay.classList.toggle('vis', isOpen);
+  btn.classList.toggle('open', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+function closeMenu() {
+  document.getElementById('mobileMenu').classList.remove('vis');
+  document.getElementById('mmOverlay').classList.remove('vis');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeMobile(el) {
+  closeMenu();
+  document.querySelectorAll('.mm-link').forEach(a => a.classList.remove('act'));
+  el.classList.add('act');
+}
+
+/* ==============================================================
+   WHATSAPP — CAMBIA EL NÚMERO POR EL TUYO
+   Formato: código de país + número, sin el símbolo +
+   Ejemplo Perú: "51987654321"
+   ============================================================== */
+const WA_NUMERO = "51916659839";
+
+function consultarLibro(e) {
+  e.preventDefault();
+  const libro = e.currentTarget.dataset.libro;
+  const msg = encodeURIComponent(`Me interesa este libro 📖\n\n*${libro}*\n\n ¿Precio?`);
+  window.open(`https://wa.me/${WA_NUMERO}?text=${msg}`, '_blank');
+}
+function irMegapack(e) {
+  e.preventDefault();
+  const msg = encodeURIComponent("Quiero más información sobre el MegaPack de Ebook de Odontología 🔥");
+  window.open(`https://wa.me/${WA_NUMERO}?text=${msg}`, '_blank');
+}
+
+/* Nav activo al hacer scroll */
+function setAct(el) {
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('act'));
+  el.classList.add('act');
+}
+window.addEventListener('scroll', () => {
+  const y = window.scrollY + 90;
+  ['inicio','nosotros','libros'].forEach(id => {
+    const el = document.getElementById(id); if(!el) return;
+    if (y >= el.offsetTop && y < el.offsetTop+el.offsetHeight)
+      document.querySelectorAll('.nav-links a').forEach(a =>
+        a.classList.toggle('act', a.getAttribute('href')==='#'+id));
+  });
+});
+
+/* Zoom de imagen en modal */
+function abrirZoom(e) {
+  e.stopPropagation();
+  const src = document.getElementById('ipadEmoji').src;
+  if (!src || document.getElementById('ipadEmoji').style.display === 'none') return;
+  document.getElementById('imgZoomSrc').src = src;
+  document.getElementById('imgZoom').classList.add('vis');
+  document.body.style.overflow = 'hidden';
+}
+function cerrarZoom() {
+  document.getElementById('imgZoom').classList.remove('vis');
+  document.body.style.overflow = 'hidden'; /* modal sigue abierto */
+}
+
+/* Inicializar todo */
+buildSidebar();
+buildDrawer();
+buildCarrusel();
+renderLibros(LIBROS);
+
+/* ================================================================
+   CANVAS DE PARTÍCULAS — hero interactivo (mouse + touch)
+   ================================================================ */
+(function() {
+  const canvas = document.getElementById('heroCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const T   = [58, 191, 181]; /* color teal */
+  let W, H, mouse = { x: -9999, y: -9999 };
+
+  function resize() {
+    const s = document.getElementById('inicio');
+    W = canvas.width  = s.offsetWidth;
+    H = canvas.height = s.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const isMobile = window.innerWidth < 640;
+  const NPART    = isMobile ? 40 : 80;
+  const CDIST    = isMobile ? 100 : 130;
+  const MDIST    = 140;
+
+  const pts = Array.from({ length: NPART }, () => ({
+    x:  Math.random() * 1200,
+    y:  Math.random() * 900,
+    vx: (Math.random() - .5) * .5,
+    vy: (Math.random() - .5) * .5,
+    r:  Math.random() * 1.6 + .7,
+    a:  Math.random() * .5 + .2,
+  }));
+
+  const sec = document.getElementById('inicio');
+  sec.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+  });
+  sec.addEventListener('touchmove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.touches[0].clientX - r.left;
+    mouse.y = e.touches[0].clientY - r.top;
+  }, { passive: true });
+  sec.addEventListener('mouseleave', () => { mouse.x = mouse.y = -9999; });
+
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+
+      /* Atracción al cursor */
+      const dx = mouse.x - p.x, dy = mouse.y - p.y;
+      const md = Math.sqrt(dx*dx + dy*dy);
+      if (md < MDIST) {
+        const f = (1 - md/MDIST) * .018;
+        p.vx += dx*f; p.vy += dy*f;
+        const sp = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+        if (sp > 2) { p.vx = p.vx/sp*2; p.vy = p.vy/sp*2; }
+      } else {
+        const sp = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+        if (sp > .6) { p.vx *= .99; p.vy *= .99; }
+      }
+
+      /* Dibujar punto */
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${T[0]},${T[1]},${T[2]},${p.a})`;
+      ctx.fill();
+
+      /* Líneas de conexión */
+      for (let j = i+1; j < pts.length; j++) {
+        const q = pts[j];
+        const ex = p.x-q.x, ey = p.y-q.y;
+        const ed = Math.sqrt(ex*ex+ey*ey);
+        if (ed < CDIST) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = `rgba(${T[0]},${T[1]},${T[2]},${(1-ed/CDIST)*.25})`;
+          ctx.lineWidth = .7;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
 </script>
 </body>
 </html>
